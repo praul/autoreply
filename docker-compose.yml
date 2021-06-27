@@ -1,0 +1,18 @@
+---
+version: "2.1"
+services:
+  autoreply:
+    image: praul1/autoreply:latest
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Europe/London
+    volumes:
+      - ./repliers.py:/app/repliers.py
+
+    restart: unless-stopped
+    logging:
+          driver: "json-file"
+          options:
+              max-file: "1"
+              max-size: "2m"
