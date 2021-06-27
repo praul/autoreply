@@ -3,8 +3,8 @@ python based out of office notice for multiple mail accounts
 
 **Build**
 git clone repo
-    cd dockerfile/
-    docker build -t praul1/autoreply:latest .
+    `cd dockerfile/`
+    `docker build -t praul1/autoreply:latest .`
 or use praul1/autoreply:latest from docker hub
 
 **Usage:**
@@ -15,6 +15,6 @@ Create as many autoresponders as you like. Be sure that it stays a valid python 
 
 **Run:**
 Mount bind repliers.py to /app/repliers.py
-    docker run -v /PATH/TO/repliers.py:/app/repliers.py praul1/autoreply:latest
+    `docker run -v /PATH/TO/repliers.py:/app/repliers.py praul1/autoreply:latest`
 or use docker-compose.yml.
 
