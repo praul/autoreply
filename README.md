@@ -12,9 +12,10 @@ This is a very early version of this script. If you run into issues, please let 
 - Checks multiple imap accounts for mails that are both unread and unanswered
 - Sends custom plaintext and html replies to the senders.
 - Marks the corresponding incoming email as "replied"
-- Remembers the senders for a customizable time range, and does not send another reply during this time range
-- Replies only within a customizable date range - you never have to remember to disable your out-of-office notice
+- Remembers the senders for a customizable time range, and does not send another reply during this time range - no autoreply pingpong
+- Replies only within a customizable date range - you will never forget to disable your out-of-office notice
 - python based, should run on any platform
+- docker image for amd64 platforms. build yourself for arm and others.
 
 ## Usage
 - **you need to customize the repliers.py file** It needs to stay a valid python dictionary. If you have errors at startup, this could be a place to look for missing commata or quotes. You can add as many mail accounts as you like
