@@ -9,10 +9,10 @@
         - PGID=100
       # - TZ=Europe/Amsterdam
       volumes:
-        - ./repliers.py:/app/repliers.py
-        - ./db:/app/db
-        - /etc/localtime:/etc/localtime:ro
-  
+        - ./repliers.py:/app/repliers.py #you need to customize the repliers.py file and change path accordingy
+        - ./db:/app/db #this can be an empty, writable folder
+        - /etc/localtime:/etc/localtime:ro #for correct timezone. Leave as is
+   
       restart: unless-stopped
       logging:
             driver: "json-file"
@@ -21,11 +21,12 @@
                 max-size: "2m"
     
     dozzle:
-      container_name: autoreply_dozzle
+      container_name: autoreply_dozzle #this is for monitoring autoreply log in webbrowser. not needed
       image: amir20/dozzle:latest
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
       ports:
         - 10101:8080
       command: --filter name=autoreply_autoreply
+      restart: unless-stopped
   
