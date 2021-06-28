@@ -5,6 +5,8 @@ This could be for you.
 
 **WARNING:** This answers to any both unread and unanswered mail, even if it is years old.
              Don’t use on a mailbox with old messages left unread and unanswered.
+             
+This is a very early version of this script. If you run into issues, please let me know.
 
 ## Features 
 - Checks multiple imap accounts for mails that are both unread and unanswered
