@@ -1,6 +1,6 @@
 # autoreply
 This is python based, mail server independent out-of-office notice for multiple mail accounts.  
-Do you have multiple mail accounts on hosts, that don't support proper out-of-office notices?  
+**Do you have multiple mail accounts on hosts, that don't support proper out-of-office notices?**  
 This could be for you.  
 
 **WARNING:** This answers to any both unread and unanswered mail, even if it is years old.
