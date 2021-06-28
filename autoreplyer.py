@@ -83,8 +83,12 @@ class AutoReplyer:
         return True
     
     def datetime_check(self):
-        start = datetime.strptime(self.v["datetime_start"], "%Y-%m-%d %H:%M")  
-        end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")  
+        try:
+            start = datetime.strptime(self.v["datetime_start"], "%Y-%m-%d %H:%M")  
+            end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")
+        except:
+            return True
+        
         if (datetime.now() >= start and datetime.now() <= end):
             if (self.intime == False):
                 self.timeout = self.v["refresh_delay"]
@@ -184,7 +188,8 @@ class AutoReplyer:
     def run(self):
         self.create_table()
         self.cprint ('Autoreply started... Blocking rebounds for ' + str(self.v["blockhours"]) + ' hours')        
-       
+        try: self.cprint('Response active from ' + str(self.v["datetime_start"]) + ' until ' + str(self.v["datetime_end"]) )
+        except: self.cprint('No date range found. Autreply is active')
        
         while True:
             try:
