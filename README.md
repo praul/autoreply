@@ -19,10 +19,10 @@ This could be for you.
 ## Usage: Docker Container
 - **Image**: Clone this repo and build from dockerfile. Or use praul1/autoreply:latest from docker hub  
   
-- **Run**: You need to mount your repliers.py file to /app/repliers.py inside the container:  
-- **Run command**: ```docker run -v /PATH/TO/repliers.py:/app/repliers.py praul1/autoreply:latest```
+- **Run**: You need to mount your repliers.py file to /app/repliers.py inside the container. For persistance, mount a writable db folder to /app/db 
+- **Run command**: ```docker run -v /PATH/TO/repliers.py:/app/repliers.py -v /PATH/TO/db:/app/db praul1/autoreply:latest```
   
-- **Docker-Compose**: You can use the supplied docker-compose.yml. Customize path to point to your repliers.py. 
+- **Docker-Compose**: You can use the supplied docker-compose.yml. Customize path to point to your repliers.py and db folder. 
 - The docker-compose file also includes the docker-log viewer "Dozzle" (https://github.com/amir20/dozzle). When launched, you can visit: http://HOST:10101 to view the log of autoreply  
 
 ## Usage: Python
@@ -30,7 +30,7 @@ This could be for you.
 - ```pip3 install emails```
 - All files should be in the same folder. You can then launch the autoresponder with
 - ```python3 script.py```
-- 
+- There should be a writable "db"-folder in script path
  
 ## Notes & Credit
 - Thanks to BertrandBordage for the base version of this script (https://gist.github.com/BertrandBordage/e07e5fe8191590daafafe0dbb05b5a7b)
