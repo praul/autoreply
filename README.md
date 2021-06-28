@@ -5,8 +5,8 @@ This is python based, mail server independent out-of-office notice for multiple 
 **Do you have multiple mail accounts on hosts, that don't support proper out-of-office notices?**  
 This could be for you.  
 
-**WARNING:** This answers to any both unread and unanswered mail, even if it is years old.
-             Don’t use on a mailbox with old messages left unread and unanswered.
+**WARNING:** This answers to any both unread and unanswered mail, even if it is years old (if within selected date range).
+             Don’t use on a mailbox with old messages left unread and unanswered just like that. Set date range accordingly.
              
 This is a very early version of this script. If you run into issues, please let me know.
 
