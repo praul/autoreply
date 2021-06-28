@@ -6,7 +6,7 @@ This is a python based, mail server independent out-of-office notice for multipl
 This could be for you. Run this on server, nas, homelab or raspberry. Run this on any device that is on 24/7 and supports python.
 
 **WARNING:** This answers to any both unread and unanswered mail, even if it is years old (if within selected date range).
-             Don’t use on a mailbox with old messages left unread and unanswered just like that. Set date range accordingly.
+             Don’t use on a mailbox with old messages left unread and unanswered just like that. Set date range accordingly. Too many both unread and unanswered messages will slow this script down (see note below)
              
              Use at own risk. I am not responsible, If this script spams every sender in your inbox :)
              Try interactive first and cancel script if it somehow messes up.
