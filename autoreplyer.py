@@ -184,7 +184,7 @@ class AutoReplyer:
         
         try:
             while True:
-                if (datetime_check() == True): self.check_mails()
+                if (self.datetime_check() == True): self.check_mails()
                 sleep(self.v["refresh_delay"])
         except: 
             e = sys.exc_info()[0]
