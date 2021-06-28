@@ -107,7 +107,7 @@ class AutoReplyer:
         
 
     def db_connect(self):
-        db = "autoreply-" + self.v["identifier"] + ".db"
+        db = "./db/autoreply-" + self.v["identifier"] + ".db"
         self.con = sqlite3.connect(db, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         self.cur = self.con.cursor()
         
@@ -180,7 +180,7 @@ class AutoReplyer:
 
     def run(self):
         self.create_table()
-        self.cprint ('Autoreply started... Blocking rebounds for ' + str(self.v["blockhours"]) + ' hours')
+        self.cprint ('Autoreply started... Blocking rebounds for ' + str(self.v["blockhours"]) + ' hours')        
         
         try:
             while True:
@@ -189,6 +189,7 @@ class AutoReplyer:
         except: 
             e = sys.exc_info()[0]
             print (e)
+
         
     
         

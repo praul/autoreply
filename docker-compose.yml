@@ -10,6 +10,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ./repliers.py:/app/repliers.py
+      - ./db:/app/db
 
     restart: unless-stopped
     logging:
