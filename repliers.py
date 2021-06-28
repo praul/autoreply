@@ -3,6 +3,7 @@ v = [
         "identifier": "example-account", #Take a simple name, something that works as a filename
         "mymail": 'user@example.com',
         "from_address": ('Out of Office', 'user@example.com'), #Name and Email
+        "color": "OKCYAN", #HEADER, OKBLUE OKCYAN OKGREEN WARNING FAIL ENDC UNDERLINE 
         
         "refresh_delay": 5,  #delay in seconds between new email checks
 
@@ -35,6 +36,7 @@ v = [
         "identifier": "example-account", #Take a simple name, something that works as a filename
         "mymail": 'user@example.com',
         "from_address": ('Out of Office', 'user@example.com'), #Name and Email
+        "color": "OKGREEN", #Terminal Color: HEADER, OKBLUE OKCYAN OKGREEN WARNING FAIL ENDC UNDERLINE 
         
         "refresh_delay": 5,  #delay in seconds between new email checks
 

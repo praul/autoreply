@@ -14,16 +14,8 @@ import emails
 
 __author__ = 'praul'
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+
+    
 
 
 class AutoReplyer:
@@ -51,18 +43,18 @@ class AutoReplyer:
         self.imap.logout()
     
     def cprint(self, text):
-        print(bcolors.OKGREEN + self.v["mymail"] + bcolors.ENDC +  ": " + str(text) )
+        print(self.get_color() + self.v["mymail"] + self.get_color(True) +  ": " + str(text) )
 
     def sender_check(self, sender):
         self.cprint ('------> Incoming mail from ' + sender + '. Checking history....')
         
         #Check for mail from self
         if (sender in self.v["mymail"]):
-            self.cprint ('Mail from self. Not sending any mail')
+            self.cprint('Mail from self. Not sending any mail')
             return False
 
         #Check for noreply
-        if ('noreply' in sender ):
+        if ('noreply' in sender or 'mailer-daemon' in sender ):
             self.cprint ('Mail from noreply. Not sending any mail')
             return False
 
@@ -82,7 +74,26 @@ class AutoReplyer:
         if (send == False): return False      
         return True
     
-    def datetime_check(self):
+    
+    def datetime_check_mail(self,msg):
+        for header in ['date']:
+            try: 
+                datestring = self.decode_header(msg[header])
+                dateobj = datetime.strptime(datestring, '%a, %d %b %Y %H:%M:%S +%f')
+                start = datetime.strptime(self.v["datetime_start"], "%Y-%m-%d %H:%M")  
+                end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")
+            except:
+                return True
+
+            if (dateobj >= start and dateobj <= end): 
+                self.cprint (str(dateobj) + ' Message within date range.')
+                return True
+            else: 
+                return False
+    
+    
+    
+    def datetime_check_active(self):
         try:
             start = datetime.strptime(self.v["datetime_start"], "%Y-%m-%d %H:%M")  
             end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")
@@ -114,7 +125,21 @@ class AutoReplyer:
         db = "./db/autoreply-" + self.v["identifier"] + ".db"
         self.con = sqlite3.connect(db, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         self.cur = self.con.cursor()
-        
+
+    def get_color(self, end = False):
+        colors = {
+            'HEADER': '\033[95m',
+            'OKBLUE': '\033[94m',
+            'OKCYAN': '\033[96m',
+            'OKGREEN': '\033[92m',
+            'WARNING': '\033[93m',
+            'FAIL': '\033[91m',
+            'ENDC': '\033[0m',
+            'BOLD': '\033[1m',
+            'UNDERLINE': '\033[4m',
+        }
+        if (end == True): return colors['ENDC']
+        return colors[self.v["color"]] 
 
     def create_table(self):
         self.db_connect()
@@ -130,6 +155,13 @@ class AutoReplyer:
                              )
         return message
 
+    def decode_header(self,header_string):
+        try:
+            decoded_seq = email.header.decode_header(header_string)
+            print ('136 ' + str(decoded_seq))
+            return str(email.header.make_header(decoded_seq))
+        except Exception: # fallback: return as is
+            return header_string
 
     def send_auto_reply(self, original):
         sender_full = original['From']
@@ -171,17 +203,19 @@ class AutoReplyer:
         self.imap.select(readonly=True)
         _, data = self.imap.fetch(mail_number, '(RFC822)')
         self.imap.close()
+        msg = message_from_bytes(data[0][1])
         
-        self.send_auto_reply(message_from_bytes(data[0][1]))
-        self.imap.select(readonly=False)
-        self.imap.store(mail_number, '+FLAGS', '\\Answered')
-        self.imap.close()
+        if (self.datetime_check_mail(msg) == True):
+            self.send_auto_reply(msg)
+            self.imap.select(readonly=False)
+            self.imap.store(mail_number, '+FLAGS', '\\Answered')
+            self.imap.close()
 
     def check_mails(self):
         self.imap.select(readonly=False)
         _, data = self.imap.search(None, '(UNSEEN UNANSWERED)')
         self.imap.close()
-        for mail_number in data[0].split():
+        for mail_number in data[0].split():            
             self.reply(mail_number)
             time.sleep(1) #Rate Limit
 
@@ -192,8 +226,13 @@ class AutoReplyer:
         except: self.cprint('No date range found. Autreply is active')
        
         while True:
+            if (self.datetime_check_active() == True): self.check_mails()
+            sleep(self.v["refresh_delay"])
+        
+        '''
+        while True:
             try:
-                if (self.datetime_check() == True): self.check_mails()
+                if (self.datetime_check_active() == True): self.check_mails()
                 sleep(self.v["refresh_delay"])
             except: 
                 e = sys.exc_info()[0]
@@ -201,6 +240,7 @@ class AutoReplyer:
                 self.close_imap()
                 sleep(10)
                 self.login_imap()
+        '''
         
 
 
