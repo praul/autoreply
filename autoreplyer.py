@@ -225,11 +225,13 @@ class AutoReplyer:
         try: self.cprint('Response active from ' + str(self.v["datetime_start"]) + ' until ' + str(self.v["datetime_end"]) )
         except: self.cprint('No date range found. Autreply is active')
        
+        '''
         while True:
             if (self.datetime_check_active() == True): self.check_mails()
             sleep(self.v["refresh_delay"])
-        
         '''
+        
+        
         while True:
             try:
                 if (self.datetime_check_active() == True): self.check_mails()
@@ -240,7 +242,7 @@ class AutoReplyer:
                 self.close_imap()
                 sleep(10)
                 self.login_imap()
-        '''
+    
         
 
 
