@@ -8,7 +8,7 @@ This could be for you. Run this on server, nas, homelab or raspberry. Run this o
 **WARNING:** This answers to any both unread and unanswered mail, even if it is years old (if within selected date range).
              Don’t use on a mailbox with old messages left unread and unanswered just like that. Set date range accordingly. Too many both unread and unanswered messages will slow this script down (see note below). So: Clean your mailbox before using this :)
              
-             Use at own risk. I am not responsible, If this script spams every sender in your inbox :)
+             Use at own risk. I am not responsible if this script spams every sender in your inbox :)
              Try interactive first and cancel script if it somehow messes up.
              
 This is a very early version of this script. If you run into issues, please let me know.
