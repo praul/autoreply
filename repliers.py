@@ -1,6 +1,9 @@
 v = [
     {
         "identifier": "example-account", #Take a simple name, something that works as a filename
+        "mymail": 'user@example.com',
+        "from_address": ('Out of Office', 'user@example.com'), #Name and Email
+        
         "refresh_delay": 5,  #delay in seconds between new email checks
 
         "imap_server": 'imap.example.com',
@@ -18,15 +21,11 @@ v = [
         "smtp_user": 'user@example.com',
         "smtp_password": 'YOURSUPERSAFEPASSWORD',
         
-
         "blockhours": 12, #The time in hours in which autoresponder does not respond again to the same adress.
-        "mymail": 'user@example.com',
 
-        
         "datetime_start": "2020-01-01 10:00", #start responding at date."%Y-%m-%d %H:%M
         "datetime_end": "2022-01-01 10:00", #end responding at date. "%Y-%m-%d %H:%M
-
-        "from_address": ('Out of Office', 'user@example.com'), #Name and Email
+    
         "body": 'Hi, User XYZ is out of office von user@example.com.', #plain text email content
         "body_html": '<h3>Out of office</h3><p>Hi, User XYZ is out of office</p>' #html email content
     },
@@ -34,6 +33,9 @@ v = [
     {
         #you can just add another account
         "identifier": "example-account", #Take a simple name, something that works as a filename
+        "mymail": 'user@example.com',
+        "from_address": ('Out of Office', 'user@example.com'), #Name and Email
+        
         "refresh_delay": 5,  #delay in seconds between new email checks
 
         "imap_server": 'imap.example.com',
@@ -51,14 +53,11 @@ v = [
         "smtp_user": 'user@example.com',
         "smtp_password": 'YOURSUPERSAFEPASSWORD',
         
-
         "blockhours": 12, #The time in hours in which autoresponder does not respond again to the same adress.
-        "mymail": 'user@example.com',
 
         "datetime_start": "2020-01-01 10:00", #start responding at date."%Y-%m-%d %H:%M
         "datetime_end": "2022-01-01 10:00", #end responding at date. "%Y-%m-%d %H:%M
-
-        "from_address": ('Out of Office', 'user@example.com'), #Name and Email
+    
         "body": 'Hi, User XYZ is out of office von user@example.com.', #plain text email content
         "body_html": '<h3>Out of office</h3><p>Hi, User XYZ is out of office</p>' #html email content
     },
