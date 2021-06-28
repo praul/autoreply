@@ -19,4 +19,3 @@ Create as many autoresponders as you like. Be sure that it stays a valid python 
 Mount bind repliers.py to /app/repliers.py  
     ```docker run -v /PATH/TO/repliers.py:/app/repliers.py praul1/autoreply:latest```  
 or use docker-compose.yml.  
-

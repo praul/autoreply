@@ -1,12 +1,13 @@
 ---
-version: "2.1"
+version: "3"
 services:
   autoreply:
-    image: praul1/autoreply:latest
+    image: heimpixel/autoreply:latest
+    container_name: autoreply_autoreply
     environment:
       - PUID=1000
       - PGID=100
-      - TZ=Europe/London
+      - TZ=Europe/Berlin
     volumes:
       - ./repliers.py:/app/repliers.py
 
@@ -16,3 +17,12 @@ services:
           options:
               max-file: "1"
               max-size: "2m"
+  
+  dozzle:
+    container_name: autoreply_dozzle
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 10101:8080
+    command: --filter name=autoreply_autoreply

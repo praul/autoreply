@@ -30,9 +30,12 @@ class AutoReplyer:
     con = None
     cur = None
     v = None
+    timeout = None
+    intime = True
 
     def __init__(self, v):               
         self.v = v
+        self.timeout = self.v["refresh_delay"]
         self.login_imap()
         self.run()
         
@@ -78,6 +81,22 @@ class AutoReplyer:
         
         if (send == False): return False      
         return True
+    
+    def datetime_check(self):
+        start = datetime.strptime(self.v["datetime_start"], "%Y-%m-%d %H:%M")  
+        end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")  
+        if (datetime.now() >= start and datetime.now() <= end):
+            if (self.intime == False):
+                self.timeout = self.v["refresh_delay"]
+                self.cprint('In date range. Autoreply responding...')
+                self.intime = True
+            return True
+        else:
+            if (self.intime == True):
+                self.timeout = 60 #increase Timeout 
+                self.cprint('Not in date range. Autoreply sleeping...')
+                self.intime = False
+            return False
 
     def sender_memorize(self,sender):
         self.db_connect()
@@ -129,7 +148,11 @@ class AutoReplyer:
                     assert r.status_code == 250
                     success = True
                 except:
-                    self.cprint ('Error on send: ' + r + '  Wait 10s and retry...')
+                    self.cprint ('Error on send: ' + str(r))
+                    if (r.status_code == 550):
+                        self.cprint('Mailbox unavailable')
+                        return
+                    self.cprint('  Wait 10s and retry...')
                     time.sleep(10) 
         
         if (success==True): 
@@ -157,15 +180,22 @@ class AutoReplyer:
 
     def run(self):
         self.create_table()
-        self.cprint ('Now listening... Blocking rebounds for ' + str(self.v["blockhours"]) + ' hours')
+        self.cprint ('Autoreply started... Blocking rebounds for ' + str(self.v["blockhours"]) + ' hours')
         
+        while True:
+            if (self.datetime_check() == True): self.check_mails()
+            sleep(self.v["refresh_delay"])
+        
+        
+        '''
         try:
             while True:
-                self.check_mails()
+                if (datetime_check() == True): self.check_mails()
                 sleep(self.v["refresh_delay"])
         except: 
             e = sys.exc_info()[0]
             print (e)
+        '''
     
         
       
