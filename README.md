@@ -8,6 +8,8 @@ This could be for you.
 **WARNING:** This answers to any both unread and unanswered mail, even if it is years old.
              Don’t use on a mailbox with old messages left unread and unanswered.
              
+**ALSO BE AWARE:** If autoreply enters active date range, it will also respond to every both unread and unanswered mail, regardless of date. Use this primarily to determine the end of your absence.
+             
 This is a very early version of this script. If you run into issues, please let me know.
 
 ## Features 
