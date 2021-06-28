@@ -182,12 +182,6 @@ class AutoReplyer:
         self.create_table()
         self.cprint ('Autoreply started... Blocking rebounds for ' + str(self.v["blockhours"]) + ' hours')
         
-        while True:
-            if (self.datetime_check() == True): self.check_mails()
-            sleep(self.v["refresh_delay"])
-        
-        
-        '''
         try:
             while True:
                 if (datetime_check() == True): self.check_mails()
@@ -195,7 +189,7 @@ class AutoReplyer:
         except: 
             e = sys.exc_info()[0]
             print (e)
-        '''
+        
     
         
       
