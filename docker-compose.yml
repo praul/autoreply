@@ -1,29 +1,31 @@
 ---
-version: "3"
-services:
-  autoreply:
-    image: praul1/autoreply:latest
-    container_name: autoreply_autoreply
-    environment:
-      - PUID=1000
-      - PGID=100
-      - TZ=Europe/Berlin
-    volumes:
-      - ./repliers.py:/app/repliers.py
-      - ./db:/app/db
-
-    restart: unless-stopped
-    logging:
-          driver: "json-file"
-          options:
-              max-file: "1"
-              max-size: "2m"
+  version: "3"
+  services:
+    autoreply:
+      image: praul1/autoreply:latest
+      container_name: autoreply_autoreply
+      environment:
+        - PUID=1000
+        - PGID=100
+      # - TZ=Europe/Amsterdam
+      volumes:
+        - ./repliers.py:/app/repliers.py
+        - ./db:/app/db
+        - /etc/localtime:/etc/localtime:ro
   
-  dozzle:
-    container_name: autoreply_dozzle
-    image: amir20/dozzle:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 10101:8080
-    command: --filter name=autoreply_autoreply
+      restart: unless-stopped
+      logging:
+            driver: "json-file"
+            options:
+                max-file: "1"
+                max-size: "2m"
+    
+    dozzle:
+      container_name: autoreply_dozzle
+      image: amir20/dozzle:latest
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      ports:
+        - 10101:8080
+      command: --filter name=autoreply_autoreply
+  
