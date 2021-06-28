@@ -137,11 +137,11 @@ class AutoReplyer:
         self.cprint('Sending a response...')
         
         #Send with basic error prevention
-        success = False
-        for i in range(10):
+        success = False; r = None
+        for i in range(3):
             if (success != True):
-                message = self.create_auto_reply(original)
                 try:
+                    message = self.create_auto_reply(original)
                     r = message.send(   to= (sender),
                                     smtp= {'host': self.v["smtp_server"], 'port': self.v["smtp_port"], 'ssl': self.v["smtp_use_ssl"], 'user': self.v["smtp_user"], 'password': self.v["smtp_password"]}
                                 )
@@ -149,15 +149,18 @@ class AutoReplyer:
                     success = True
                 except:
                     self.cprint ('Error on send: ' + str(r))
-                    if (r.status_code == 550):
-                        self.cprint('Mailbox unavailable')
-                        return
+                    try:
+                        if (r.status_code == 550):
+                            self.cprint('Mailbox unavailable')
+                            return
+                    except:
+                        pass
                     self.cprint('  Wait 10s and retry...')
                     time.sleep(10) 
         
-        if (success==True): 
-            self.cprint('Successfully replied')
-            self.sender_memorize(sender)
+        if (success==True): self.cprint('Successfully replied')    
+        else: self.cprint('Could not respond')
+        self.sender_memorize(sender)
         
 
     def reply(self, mail_number):
@@ -181,14 +184,22 @@ class AutoReplyer:
     def run(self):
         self.create_table()
         self.cprint ('Autoreply started... Blocking rebounds for ' + str(self.v["blockhours"]) + ' hours')        
-        
-        try:
-            while True:
+       
+       
+        while True:
+            try:
                 if (self.datetime_check() == True): self.check_mails()
                 sleep(self.v["refresh_delay"])
-        except: 
-            e = sys.exc_info()[0]
-            print (e)
+            except: 
+                e = sys.exc_info()[0]
+                print (e)
+                self.close_imap()
+                sleep(10)
+                self.login_imap()
+        
+
+
+        
 
         
     
