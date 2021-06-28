@@ -2,7 +2,7 @@
 version: "3"
 services:
   autoreply:
-    image: heimpixel/autoreply:latest
+    image: praul1/autoreply:latest
     container_name: autoreply_autoreply
     environment:
       - PUID=1000
