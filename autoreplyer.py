@@ -1,11 +1,5 @@
-
-
 from email import message_from_bytes
 from imaplib import IMAP4, IMAP4_SSL, IMAP4_PORT, IMAP4_SSL_PORT
-from os import execlp
-from subprocess import call
-from textwrap import dedent
-from time import sleep
 import sqlite3
 from datetime import datetime, timedelta
 import time
@@ -13,9 +7,6 @@ import sys
 import emails
 
 __author__ = 'praul'
-
-
-    
 
 
 class AutoReplyer:
@@ -31,7 +22,6 @@ class AutoReplyer:
         self.login_imap()
         self.run()
         
-    
     def login_imap(self):
         if self.v["imap_use_ssl"]:
             self.imap = IMAP4_SSL(self.v["imap_server"], self.v["imap_ssl_port"])
@@ -46,7 +36,7 @@ class AutoReplyer:
         print(self.get_color() + self.v["mymail"] + self.get_color(True) +  ": " + str(text) )
 
     def sender_check(self, sender):
-        self.cprint ('------> Incoming mail from ' + sender + '. Checking history....')
+        self.cprint ('Mail from ' + sender + '. Checking...')
         
         #Check for mail from self
         if (sender in self.v["mymail"]):
@@ -73,12 +63,11 @@ class AutoReplyer:
         
         if (send == False): return False      
         return True
-    
-    
+       
     def datetime_check_mail(self,msg):
         for header in ['date']:
             try: 
-                datestring = self.decode_header(msg[header])
+                datestring = msg[header]
                 dateobj = datetime.strptime(datestring, '%a, %d %b %Y %H:%M:%S +%f')
                 start = datetime.strptime(self.v["datetime_start"], "%Y-%m-%d %H:%M")  
                 end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")
@@ -86,12 +75,10 @@ class AutoReplyer:
                 return True
 
             if (dateobj >= start and dateobj <= end): 
-                self.cprint (str(dateobj) + ' Message within date range.')
+                self.cprint (str(dateobj) + ' Mail within date range.')
                 return True
             else: 
                 return False
-    
-    
     
     def datetime_check_active(self):
         try:
@@ -103,13 +90,13 @@ class AutoReplyer:
         if (datetime.now() >= start and datetime.now() <= end):
             if (self.intime == False):
                 self.timeout = self.v["refresh_delay"]
-                self.cprint('In date range. Autoreply responding...')
+                self.cprint('In date range. Autoreply is now responding...')
                 self.intime = True
             return True
         else:
             if (self.intime == True):
                 self.timeout = 60 #increase Timeout 
-                self.cprint('Not in date range. Autoreply sleeping...')
+                self.cprint('Not in date range. Autoreply is now sleeping...')
                 self.intime = False
             return False
 
@@ -118,8 +105,7 @@ class AutoReplyer:
         self.cprint ('Memorizing ' + sender)
         self.cur.execute("INSERT INTO senders (mail, date) values (?, ?)", (sender, datetime.now() ) )
         self.con.commit()
-        self.con.close()
-        
+        self.con.close()    
 
     def db_connect(self):
         db = "./db/autoreply-" + self.v["identifier"] + ".db"
@@ -155,19 +141,11 @@ class AutoReplyer:
                              )
         return message
 
-    def decode_header(self,header_string):
-        try:
-            decoded_seq = email.header.decode_header(header_string)
-            print ('136 ' + str(decoded_seq))
-            return str(email.header.make_header(decoded_seq))
-        except Exception: # fallback: return as is
-            return header_string
-
     def send_auto_reply(self, original):
         sender_full = original['From']
         try: sender = (sender_full.split('<'))[1].split('>')[0]
         except: sender = sender_full
-             
+                   
         #Check if a response needs to be sent
         if (self.sender_check(sender) != True): return
         self.cprint('Sending a response...')
@@ -179,8 +157,14 @@ class AutoReplyer:
                 try:
                     message = self.create_auto_reply(original)
                     r = message.send(   to= (sender),
-                                    smtp= {'host': self.v["smtp_server"], 'port': self.v["smtp_port"], 'ssl': self.v["smtp_use_ssl"], 'user': self.v["smtp_user"], 'password': self.v["smtp_password"]}
-                                )
+                                        smtp= {
+                                            'host': self.v["smtp_server"], 
+                                            'port': self.v["smtp_port"], 
+                                            'ssl': self.v["smtp_use_ssl"], 
+                                            'user': self.v["smtp_user"], 
+                                            'password': self.v["smtp_password"]
+                                            }
+                                     )
                     assert r.status_code == 250
                     success = True
                 except:
@@ -221,27 +205,27 @@ class AutoReplyer:
 
     def run(self):
         self.create_table()
-        self.cprint ('Autoreply started... Blocking rebounds for ' + str(self.v["blockhours"]) + ' hours')        
+        self.cprint ('Autoreply started... Blocking re-replies for ' + str(self.v["blockhours"]) + ' hours')        
         try: self.cprint('Response active from ' + str(self.v["datetime_start"]) + ' until ' + str(self.v["datetime_end"]) )
         except: self.cprint('No date range found. Autreply is active')
-       
+               
         '''
         while True:
             if (self.datetime_check_active() == True): self.check_mails()
-            sleep(self.v["refresh_delay"])
+            time.sleep(self.v["refresh_delay"])
         '''
-        
-        
+
         while True:
             try:
                 if (self.datetime_check_active() == True): self.check_mails()
-                sleep(self.v["refresh_delay"])
+                time.sleep(self.v["refresh_delay"])
             except: 
                 e = sys.exc_info()[0]
                 print (e)
                 self.close_imap()
-                sleep(10)
+                time.sleep(10)
                 self.login_imap()
+
     
         
 
