@@ -309,6 +309,7 @@ class AutoReplyer:
         while True:
             try:
                 if (self.check_program_datetime() == True): self.check_mails()
+                if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
                 time.sleep(self.v["refresh_delay"])
             except: 
                 e = sys.exc_info()[0]
