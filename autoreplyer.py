@@ -259,6 +259,7 @@ class AutoReplyer:
 
     def handle_reply(self, mail_number):
         data = self.fetch_mails(mail_number)
+        if (data == False): return
         message = self.Mailmessage(data, mail_number, self.debug)
 
         if (self.check_mail_datetime(message) == True and self.check_mail_messageid(message) == True): #Shall autoreply respond? Email new, unknown and sender not blocked
@@ -269,15 +270,24 @@ class AutoReplyer:
             if (message.sent == True): time.sleep(2)     
          
     def fetch_mails(self, mail_number):
-        self.imap.select(readonly=True)
-        _, data = self.imap.fetch(mail_number, '(RFC822)')
-        self.imap.close()
+        try:
+            self.imap.select(readonly=True)
+            _, data = self.imap.fetch(mail_number, '(RFC822)')
+            self.imap.close()
+        except:   
+            self.out ('Error on Imap Search') 
+            return False
         return data
   
     def check_mails(self):
-        self.imap.select(readonly=False)
-        _, data = self.imap.search(None, '(UNSEEN UNANSWERED)')
-        self.imap.close()        
+        try:
+            self.imap.select(readonly=False)
+            _, data = self.imap.search(None, '(UNSEEN UNANSWERED)')
+            self.imap.close()     
+        except:
+            self.out ('Error on Imap Search') 
+            return 
+
         for mail_number in data[0].split():            
             self.handle_reply(mail_number)
 
@@ -288,12 +298,14 @@ class AutoReplyer:
         try: self.out('Response active from ' + str(self.v["datetime_start"]) + ' until ' + str(self.v["datetime_end"]) )
         except: self.out('No date range found. Autreply is active')
        
+        '''
         while True:
             if (self.check_program_datetime() == True): self.check_mails()
             if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
             time.sleep(self.v["refresh_delay"])
-        
         '''
+        
+        
         while True:
             try:
                 if (self.check_program_datetime() == True): self.check_mails()
@@ -304,7 +316,7 @@ class AutoReplyer:
                 self.connect_imap_logout()
                 time.sleep(10)
                 self.connect_imap_login()
-        '''
+        
 
     
         
