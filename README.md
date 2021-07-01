@@ -45,7 +45,7 @@ This is a very early version of this script. If you run into issues, please let 
 - "debug" key. Leave it at "False", it will spam your console otherwise
  
 ## Notes & Credit
-- Thanks to BertrandBordage for the base version of this script (https://gist.github.com/BertrandBordage/e07e5fe8191590daafafe0dbb05b5a7b)
+- Thanks to BertrandBordage for the base version of this script (https://gist.github.com/BertrandBordage/e07e5fe8191590daafafe0dbb05b5a7b). Code is now almost completely rewritten, but this was a good starting point.
 - Using pythons email and smtplib lead to empty messages on some (office365) mail accounts. For heavens sake, I could not figure it out and therefore used python-emails library, which is missing some features (in-reply-to), but is working stable.
 - Using pythons multiprocessing is a quick-and-dirty approach for supporting multiple accounts simultaneously without having to rewrite the base script for this
 - I made this basically for myself, so I'm probably not gonna pump this up with feature requests :) 
