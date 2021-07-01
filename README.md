@@ -42,6 +42,10 @@ This is a very early version of this script. If you run into issues, please let 
 - All files should be in the same folder. You can then launch the autoresponder with
 - ```python3 script.py```
 - There should be a writable "db"-folder in script path
+
+## Settings (repliers.py)
+- "remember" mode. Set "mode": "remember" in repliers.py. In this mode, emails will NOT be marked as "replied". Instead, autoreply remembers the corresponding messageids. This is way slower than "reply" (default setting). Use this, if you still want to keep track of the replied emails you got during your out-of-office. Keep in mind, this could get slow, as there is no possibility to tell imap which mails to fetch. autoreplyer will always fetch all (unanswered, unread) mails and loop through them. Everytime. On remember mode, minimum refresh rate is 30 seconds.
+- "debug" key. Leave it at "False", it will spam your console otherwise
  
 ## Notes & Credit
 - Thanks to BertrandBordage for the base version of this script (https://gist.github.com/BertrandBordage/e07e5fe8191590daafafe0dbb05b5a7b)
