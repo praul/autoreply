@@ -14,9 +14,8 @@ class AutoReplyer:
     cur = None
     v = None
     timeout = None
-    intime = True
+    intime = None
     ignorelist = []
-    override_memorize = False
     imap_login = False
     debug = False
 
@@ -73,7 +72,6 @@ class AutoReplyer:
         try: self.debug = self.v['debug']
         except: self.debug = False
         
-        self.connect_imap_login()
         self.run()
 
     def debug_print(self, text):
@@ -153,15 +151,17 @@ class AutoReplyer:
             return True
         
         if (datetime.now() >= start and datetime.now() <= end):
-            if (self.intime == False):
+            if (self.intime == False or self.intime == None):
                 self.timeout = self.v["refresh_delay"]
                 self.out('In date range. Autoreply is now responding...')
+                self.connect_imap_login()
                 self.intime = True
             return True
         else:
-            if (self.intime == True):
+            if (self.intime == True or self.intime == None):
                 self.timeout = 60 #increase Timeout 
                 self.out('Not in date range. Autoreply is now sleeping...')
+                self.connect_imap_logout()
                 self.intime = False
             return False
     
@@ -314,22 +314,16 @@ class AutoReplyer:
         
 
         while True:
-            while self.imap_login == True:
-                try:
-                    if (self.check_program_datetime() == True): self.check_mails()
-                    if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
-                    time.sleep(self.v["refresh_delay"])
-                except: 
-                    e = sys.exc_info()[0]
-                    print (e)
-                    time.sleep(10)
+            try:
+                if (self.check_program_datetime() == True): self.check_mails()
+                if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
+                time.sleep(self.v["refresh_delay"])
+            except: 
+                e = sys.exc_info()[0]
+                print (e)
+                time.sleep(10)
             
-            self.out('Reconnecting...')
-            self.connect_imap_logout()
-            time.sleep(5)
-            self.connect_imap_login()
-            time.sleep(5)
-            
+           
         
 
     
