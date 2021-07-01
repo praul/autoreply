@@ -313,24 +313,24 @@ class AutoReplyer:
         try: self.out('Response active from ' + str(self.v["datetime_start"]) + ' until ' + str(self.v["datetime_end"]) )
         except: self.out('No date range found. Autreply is active')
        
-        
+        '''
         while True:
             if (self.check_program_datetime() == True): self.check_mails()
             if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
             time.sleep(self.v["refresh_delay"])
-        
-        
         '''
+        
+        
         while True:
             try:
                 if (self.check_program_datetime() == True): self.check_mails()
                 if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
                 time.sleep(self.v["refresh_delay"])
             except: 
-                e = sys.exc_info()[0]
-                print (e)
+                self.out(sys.exc_info()[0])
+                self.intime = None
                 time.sleep(10)
-        '''
+        
             
            
         
