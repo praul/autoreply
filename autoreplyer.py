@@ -285,11 +285,19 @@ class AutoReplyer:
             self.out ('Error on Imap Search') 
             return False
         return data
+
+    def check_mails_search(self):
+        default = 'UNSEEN UNANSWERED'
+        yesterday = (datetime.now() - timedelta(hours=24)).strftime("%d-%b-%Y")
+        search = '('+ default + ' SINCE ' + yesterday + ')'
+        self.debug_print('IMAP SEARCH COMMAND: ' + search)
+        return search
   
     def check_mails(self):
+        self.check_mails_search()
         try:
             self.imap.select(readonly=False)
-            _, data = self.imap.search(None, '(UNSEEN UNANSWERED)')
+            _, data = self.imap.search(None, self.check_mails_search())
             self.imap.close()     
         except:
             self.out ('Error on Imap Search') 
@@ -305,14 +313,14 @@ class AutoReplyer:
         try: self.out('Response active from ' + str(self.v["datetime_start"]) + ' until ' + str(self.v["datetime_end"]) )
         except: self.out('No date range found. Autreply is active')
        
-        '''
+        
         while True:
             if (self.check_program_datetime() == True): self.check_mails()
             if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
             time.sleep(self.v["refresh_delay"])
-        '''
         
-
+        
+        '''
         while True:
             try:
                 if (self.check_program_datetime() == True): self.check_mails()
@@ -322,6 +330,7 @@ class AutoReplyer:
                 e = sys.exc_info()[0]
                 print (e)
                 time.sleep(10)
+        '''
             
            
         
