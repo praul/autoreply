@@ -51,4 +51,3 @@ If you run into issues, please let me know.
 - Using pythons email and smtplib lead to empty messages on some (office365) mail accounts. For heavens sake, I could not figure it out and therefore used python-emails library, which is missing some features (in-reply-to), but is working stable.
 - Using pythons multiprocessing is a quick-and-dirty approach for supporting multiple accounts simultaneously without having to rewrite the base script for this
 - I made this basically for myself, so I'm probably not gonna pump this up with feature requests :) 
-- The script does not fetch unread or unanswered emails via date. It simply ignores every email, that is not in the specified date range. It does that like every 5 seconds (everytime it checks for new mails). So..... if you have thousands of both unread and unanswered mails in a mailbox - this could get quite slow. Unneccessarily slow. This is something, that could be improved.
