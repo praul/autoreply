@@ -41,7 +41,7 @@ This is a very early version of this script. If you run into issues, please let 
 - There should be a writable "db"-folder in script path
 
 ## Settings (repliers.py)
-- "remember" mode. Set ```"mode": "remember",``` in repliers.py. In this mode, emails will NOT be marked as "replied". Instead, autoreply remembers the corresponding messageids. This is way slower than "reply" (default setting). Use this, if you still want to keep track of the replied emails you got during your out-of-office. Keep in mind, this could get slow, as there is no possibility to tell imap which mails to fetch. autoreplyer will always fetch all (unanswered, unread) mails and loop through them. Everytime. On remember mode, minimum refresh rate is 30 seconds.
+- **remember-mode**. Set ```"mode": "remember",``` in repliers.py. In this mode, emails will NOT be marked as "replied". Instead, autoreply remembers the corresponding messageids. This is way slower than "reply" (default setting). Use this, if you still want to keep track, to which emails **you** actually replied. Keep in mind, this could get slow, as there is no possibility to tell imap exactly which mails to fetch. As of 0.41 autoreplyer only fetches mails from the last two days (unanswered, unread) and loops through them. If you get thousands of emails everyday, this will be slow. On remember mode, minimum refresh rate is 30 seconds.
 - "debug" key. Leave it at "False", it will spam your console otherwise
  
 ## Notes & Credit
