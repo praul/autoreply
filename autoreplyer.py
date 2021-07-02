@@ -18,6 +18,7 @@ class AutoReplyer:
     ignorelist = []
     imap_login = False
     debug = False
+    version = '0.42'
 
     class Mailmessage:
         msg = None
@@ -33,31 +34,23 @@ class AutoReplyer:
 
 
         def __init__(self, data, mail_number, debug=False):
-            self.debug = debug
             self.msg_number = mail_number
             self.msg = self.get_message(data)
             self.msg_id = self.get_messageid(self.msg) 
             self.sender = self.get_sender(self.msg)
-        
-        def debug_print(self, text):
-            if self.debug: print(str(text))   
 
         def get_message(self, data):
             msg = email.message_from_bytes(data[0][1])
             return msg
 
         def get_messageid(self, msg):
-            self.debug_print('Getting MessageID...')
             for header in ['Message-ID']:
-                self.debug_print(msg[header])
                 if (msg[header] is not None):
                     messageid = str(msg[header]).replace('<', '').replace('>','').replace("\n", "").replace("\r", "")
-                    self.debug_print ('MessageID is ' + messageid)
                     self.has_msg_id = True
                     return messageid
             return 'no-message-id'
            
-    
         def get_sender(self,msg):
             sender_full = msg['From']
             try: sender = (sender_full.split('<'))[1].split('>')[0]
@@ -76,9 +69,11 @@ class AutoReplyer:
 
     def debug_print(self, text):
         if self.debug: self.out(str(text))
+        return
     
     def out(self, text):
         print(self.color() + self.v["mymail"] + self.color(True) +  ": " + str(text) )
+        return
 
     def color(self, end = False):
         colors = { 'HEADER': '\033[95m', 'OKBLUE': '\033[94m', 'OKCYAN': '\033[96m', 'OKGREEN': '\033[92m', 'WARNING': '\033[93m', 'FAIL': '\033[91m', 'ENDC': '\033[0m', 'BOLD': '\033[1m', 'UNDERLINE': '\033[4m',        }
@@ -95,11 +90,13 @@ class AutoReplyer:
             self.imap_login = True
         except:
             self.imap_login = False
+        return
     
     def connect_imap_logout(self):
         try: self.imap.logout()
         except: pass
         self.imap_login = False
+        return
     
     def check_sender(self, message):
         sender = message.sender
@@ -169,26 +166,32 @@ class AutoReplyer:
         self.debug_print('Checking Message ID: ' + message.msg_id )
     
         if (message.msg_id in self.ignorelist):
-            self.debug_print('Found in memory:' + message.msg_id )
-            return False
+           self.debug_print('Found in memory:' + message.msg_id )
+           return False
  
-        self.db_connect(); send = True
-        for row in self.cur.execute("SELECT id, messageid FROM messages WHERE messageid=?", (message.msg_id,)):       
+        self.db_connect()
+        for row in self.cur.execute("SELECT id, date FROM messages WHERE messageid=?", (message.msg_id,)):       
             self.debug_print('Found :' +message.msg_id + ' at ID ' + str(row[0]))
-            self.ignorelist.append(message.msg_id)
+            try: 
+                if ((datetime.now() - timedelta(hours=24)) < datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S.%f")):
+                    self.ignorelist.append(message.msg_id)
+                    self.debug_print('Entry is recent. Adding to ignorelist')
+                    self.debug_print(str(self.ignorelist))
+            except: pass
             self.con.close()
             return False
     
         self.out('New Message: ' + message.msg_id)
         self.con.close()
-        return send
+        return True
 
     def save_sender(self,message):
         self.db_connect()
         self.out('Memorizing ' + message.sender)
         self.cur.execute("INSERT INTO senders (mail, date) values (?, ?)", (message.sender, datetime.now() ) )
         self.con.commit()
-        self.con.close()    
+        self.con.close()   
+        return 
     
     def save_email(self, message):
         if (self.v['mode'] != 'remember' or message.has_msg_id == False):
@@ -200,24 +203,31 @@ class AutoReplyer:
         
         if (message.has_msg_id == True):        
             self.db_connect()
-            self.out('Memorizing Message ' + message.msg_id)
-            self.cur.execute("INSERT INTO messages (messageid) values (?)", (message.msg_id,) )
+            self.out('Memorizing Message ' + message.msg_id + ' ' + datetime.now().strftime("%Y-%m-%d %H:%M") )
+            self.cur.execute("INSERT INTO messages (messageid, date) values (?, ?)", (message.msg_id, datetime.now(),) )
             self.ignorelist.append(message.msg_id)
+            self.out('Current size of ram-ignorelist: ' + str(len(self.ignorelist)))
             self.con.commit()
-            self.con.close()    
+            self.con.close()
+        return    
            
     def db_connect(self):
         db = "./db/autoreply-" + self.v["identifier"] + ".db"
         self.con = sqlite3.connect(db, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         self.cur = self.con.cursor()
+        return
 
     def db_create_table(self):
         self.db_connect()
         try: self.cur.execute('''CREATE TABLE senders (id INTEGER PRIMARY KEY, mail text, date datetime)''')  
         except: pass  
-        try: self.cur.execute('''CREATE TABLE messages (id INTEGER PRIMARY KEY, messageid text)''')  
+        try: self.cur.execute('''CREATE TABLE messages (id INTEGER PRIMARY KEY, messageid text, date datetime)''')  
         except: pass          
-        self.con.commit(); self.con.close()    
+        try: self.cur.execute( "ALTER TABLE messages ADD COLUMN date datetime")
+        except: pass
+        
+        self.con.commit(); self.con.close() 
+        return   
     
     def create_reply(self, message):  
         reply = emails.html(  html= self.v["body_html"],
@@ -262,7 +272,8 @@ class AutoReplyer:
         if (success==True): 
             self.out('Successfully replied')   
             message.sent = True 
-        else: self.out('Could not respond')      
+        else: self.out('Could not respond')   
+        return success  
 
     def handle_reply(self, mail_number):
         data = self.fetch_mails(mail_number)
@@ -274,7 +285,10 @@ class AutoReplyer:
                 self.send_reply(message)
                 self.save_sender(message)
             self.save_email(message)  
-            if (message.sent == True): time.sleep(2)     
+            if (message.sent == True): time.sleep(2)   
+        
+        self.ignorelist = self.ignorelist[-500:] #Limit size of ignorelist
+        return
          
     def fetch_mails(self, mail_number):
         try:
@@ -282,7 +296,7 @@ class AutoReplyer:
             _, data = self.imap.fetch(mail_number, '(RFC822)')
             self.imap.close()
         except:   
-            self.out ('Error on Imap Search') 
+            self.out ('Error on Imap Fetch') 
             return False
         return data
 
@@ -294,7 +308,6 @@ class AutoReplyer:
         return search
   
     def check_mails(self):
-        self.check_mails_search()
         try:
             self.imap.select(readonly=False)
             _, data = self.imap.search(None, self.check_mails_search())
@@ -305,11 +318,12 @@ class AutoReplyer:
 
         for mail_number in data[0].split():            
             self.handle_reply(mail_number)
+        return
 
 
     def run(self):
         self.db_create_table()
-        self.out('Autoreply started in ' + self.v["mode"] + '-mode ... Blocking re-replies for ' + str(self.v["blockhours"]) + ' hours')        
+        self.out('Autoreply ' + self.version + ' started in ' + self.v["mode"] + '-mode ... Blocking re-replies for ' + str(self.v["blockhours"]) + ' hours')        
         try: self.out('Response active from ' + str(self.v["datetime_start"]) + ' until ' + str(self.v["datetime_end"]) )
         except: self.out('No date range found. Autreply is active')
        
@@ -318,7 +332,8 @@ class AutoReplyer:
             if (self.check_program_datetime() == True): self.check_mails()
             if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
             time.sleep(self.v["refresh_delay"])
-        '''
+        '''  
+        
         
         
         while True:
@@ -330,6 +345,7 @@ class AutoReplyer:
                 self.out(sys.exc_info()[0])
                 self.intime = None
                 time.sleep(10)
+        
         
             
            
