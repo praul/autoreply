@@ -10,7 +10,9 @@ See Changelog here: https://github.com/praul/autoreply/wiki/Changelog
 **Use at own risk. I am not responsible if this script spams every sender in your inbox :)
 Try interactive first and cancel script if it somehow messes up.**
              
-This is a very early version of this script. If you run into issues, please let me know.
+I run this 24/7 on a vserver for multiple mail accounts without problems, but please note: 
+This is a early version of this script. 
+If you run into issues, please let me know. 
 
 ## Features 
 - Checks multiple imap accounts for mails that are both unread and unanswered
@@ -49,4 +51,4 @@ This is a very early version of this script. If you run into issues, please let 
 - Using pythons email and smtplib lead to empty messages on some (office365) mail accounts. For heavens sake, I could not figure it out and therefore used python-emails library, which is missing some features (in-reply-to), but is working stable.
 - Using pythons multiprocessing is a quick-and-dirty approach for supporting multiple accounts simultaneously without having to rewrite the base script for this
 - I made this basically for myself, so I'm probably not gonna pump this up with feature requests :) 
-- The script does not fetch unread or unanswered emails via date. It simply ignores every email, that is not in the specified date range. It does that like every 5 seconds (everytime it checks for new mails). So..... if you have thousands of both unread and unanswered mails in a mailbox - this could get quite slow. Unneccessarily slow. This is something, that could be improved.
+- If you start this script and have both unanswered and unread mails in your inbox, autoreply will answer to those, that were received up to 20 minutes ago. It does so to prevent unanswered mails on restart or downtime.
