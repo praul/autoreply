@@ -97,6 +97,11 @@ class AutoReplyer:
         except: pass
         self.imap_login = False
         return
+
+    def connect_imap_reconnect(self):
+        self.connect_imap_logout()
+        self.connect_imap_login()
+        return self.imap_login
     
     def check_sender(self, message):
         sender = message.sender
@@ -297,6 +302,8 @@ class AutoReplyer:
             self.imap.close()
         except:   
             self.out ('Error on Imap Fetch') 
+            self.connect_imap_reconnect()
+            self.out ('Connected: ' + str(self.imap_login))
             return False
         return data
 
@@ -313,7 +320,9 @@ class AutoReplyer:
             _, data = self.imap.search(None, self.check_mails_search())
             self.imap.close()     
         except:
-            self.out ('Error on Imap Search') 
+            self.out ('Error on Imap Search. Reconnecting') 
+            self.connect_imap_reconnect()
+            self.out ('Connected: ' + str(self.imap_login))
             return 
 
         for mail_number in data[0].split():            
