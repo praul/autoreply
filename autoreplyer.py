@@ -117,7 +117,7 @@ class AutoReplyer:
             self.out('Found ' + sender + ' at ' + str(row[1]) + ' - ID ' + str(row[0]))
             if (then < breakdate):  #If older: Delete
                 self.out('Last entry, ID' + str(row[0]) +  ' from ' + sender + ' is old. Delete...' )
-                self.cur.execute("DELETE FROM senders WHERE id=?", (str(row[0])))
+                self.cur.execute("DELETE FROM senders WHERE id=?", ( str(row[0]), ) )
             elif (then >= breakdate): #If Recent: Reject
                 self.out('Recent entry found. Not sending any mail' )
                 self.con.close()
@@ -341,7 +341,7 @@ class AutoReplyer:
             if (self.check_program_datetime() == True): self.check_mails()
             if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
             time.sleep(self.v["refresh_delay"])
-        '''  
+        ''' 
         
         
         
@@ -354,6 +354,7 @@ class AutoReplyer:
                 self.out(sys.exc_info()[0])
                 self.intime = None
                 time.sleep(10)
+        
         
         
             
