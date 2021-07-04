@@ -145,7 +145,7 @@ class AutoReplyer:
                 return True
 
             if (dateobj >= start and dateobj <= end): 
-                self.out('New mail within date range.' + str(dateobj) + ' UTC')
+                self.debug_print('New mail within date range.' + str(dateobj) + ' UTC')
                 return True
             else: 
                 self.debug_print ('Message not within date range. Message Date ' + str(dateobj) + ' UTC')
