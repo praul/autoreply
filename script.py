@@ -7,7 +7,6 @@ from autoreplyer import AutoReplyer
 from multiprocessing import Process
 from repliers import *
 
-
 def start_autoreplier(v):
     autoreplier= AutoReplyer(v)
 
@@ -21,6 +20,5 @@ def startup():
 
     for p in processes:
         p.join()
-
 
 startup()
