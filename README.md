@@ -24,7 +24,7 @@ If you run into issues, please let me know.
 - docker image for amd64 platforms. build yourself for arm and others.
 
 ## Usage
-- **you need to customize the repliers.py file** It needs to stay a valid python dictionary. All the keys have to remain! If you have errors at startup, this could be a place to look for missing commata or quotes. You can add as many mail accounts as you like
+- **you need to customize the repliers.py file** It needs to stay a valid python dictionary. All the keys have to remain! If you have errors at startup, this could be a place to look for missing commata or quotes. You can add as many mail accounts as you like. **USE UTC DATETIMES as of 0.5**
 
 ## Usage: Docker Container
 - **Image**: Clone this repo and build from dockerfile. Or use praul1/autoreply:latest from docker hub  
