@@ -36,8 +36,6 @@ class AutoReplyer:
         sent = False
         debug = False
 
-
-
         def __init__(self, data, mail_number, debug=False):
             self.msg_number = mail_number
             self.msg = self.get_message(data)
@@ -328,8 +326,9 @@ class AutoReplyer:
             self.imap.select(readonly=False)
             _, data = self.imap.search(None, self.check_mails_search())
             self.imap.close()  
-            
+     
         except:
+           
             self.out ('Error on Imap Search. Reconnecting') 
             self.connect_imap_reconnect()
             self.out ('Connected: ' + str(self.mail_isloggedin))
@@ -338,7 +337,7 @@ class AutoReplyer:
         for mail_number in data[0].split():            
             self.handle_reply(mail_number)
         
-        
+        self.mail_lastcheck = datetime.utcnow() - timedelta(seconds = ( int(self.v["refresh_delay"])*2) )
         return
 
 
