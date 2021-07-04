@@ -46,6 +46,9 @@ If you run into issues, please let me know.
 - **remember-mode**. Set ```"mode": "remember",``` in repliers.py. In this mode, emails will NOT be marked as "replied". Instead, autoreply remembers the corresponding messageids. This is way slower than "reply" (default setting). Use this, if you still want to keep track, to which emails **you** actually replied. Keep in mind, this could get slow, as there is no possibility to tell imap exactly which mails to fetch. As of 0.41 autoreplyer only fetches mails from the last two days (unanswered, unread) and loops through them. If you get thousands of emails everyday, this will be slow. On remember mode, minimum refresh rate is 30 seconds.
 - "debug" key. Leave it at "False", it will spam your console otherwise
  
+## Problems ? 
+- If you get "Error on imap search" **right after starting the program or docker container**, restart the program or container.
+
 ## Notes & Credit
 - Thanks to BertrandBordage for the base version of this script (https://gist.github.com/BertrandBordage/e07e5fe8191590daafafe0dbb05b5a7b). Code is now almost completely rewritten, but this was a good starting point.
 - Using pythons email and smtplib lead to empty messages on some (office365) mail accounts. For heavens sake, I could not figure it out and therefore used python-emails library, which is missing some features (in-reply-to), but is working stable.
