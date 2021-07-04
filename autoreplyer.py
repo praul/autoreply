@@ -68,7 +68,7 @@ class AutoReplyer:
         try: self.debug = self.v['debug']
         except: self.debug = False       
 
-        self.mail_lastcheck = datetime.utcnow() - timedelta(minutes=30)
+        self.mail_lastcheck = datetime.utcnow() - timedelta(minutes=20)
         
         self.run()
 
@@ -335,7 +335,7 @@ class AutoReplyer:
         for mail_number in data[0].split():            
             self.handle_reply(mail_number)
         
-        self.mail_lastcheck = datetime.utcnow() - timedelta(minutes=30)
+        self.mail_lastcheck = datetime.utcnow() - timedelta(minutes=20)
         return
 
 
