@@ -47,7 +47,7 @@ If you run into issues, please let me know.
 - "debug" key. Leave it at "False", it will spam your console otherwise
  
 ## Problems ? 
-- If you get "Error on imap search" **right after starting the program or docker container**, restart the program or container.
+- If you get "Error on imap search" **right after starting the program or docker container**, restart the program or container. See https://github.com/praul/autoreply/issues/2 I will investigate this further.
 
 ## Notes & Credit
 - Thanks to BertrandBordage for the base version of this script (https://gist.github.com/BertrandBordage/e07e5fe8191590daafafe0dbb05b5a7b). Code is now almost completely rewritten, but this was a good starting point.
