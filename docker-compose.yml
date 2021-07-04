@@ -2,12 +2,11 @@
 version: "3"
 services:
   autoreply:
-    image: praul1/autoreply:latest
+    image: praul1/autoreply:0.5-testing
     container_name: autoreply_autoreply
     environment:
-      - PUID=1000
+      - PUID=1000 
       - PGID=100
-    # - TZ=Europe/Amsterdam
     volumes:
       - ./repliers.py:/app/repliers.py
       - ./db:/app/db
@@ -27,4 +26,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 10101:8080
-    command: --filter name=autoreply_autoreply
+    command: --filter name=autoreply_autoreply --no-analytics
