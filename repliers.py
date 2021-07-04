@@ -5,6 +5,7 @@ v = [
         "from_address": ('Out of Office', 'user@example.com'), #Name and Email
         "color": "OKCYAN", #HEADER, OKBLUE OKCYAN OKGREEN WARNING FAIL ENDC UNDERLINE 
         "mode": 'reply', #"reply" or "remember"   - how to remember emails, that already have been replied to. mark as replied or remember in database (slower). 
+    
         "debug": False, #When set to true, this will spam your console. Leave it at False :)
 
 
@@ -27,8 +28,8 @@ v = [
         
         "blockhours": 12, #The time in hours in which autoresponder does not respond again to the same adress.
 
-        "datetime_start": "2020-01-01 10:00", #start responding at date."%Y-%m-%d %H:%M
-        "datetime_end": "2022-01-01 10:00", #end responding at date. "%Y-%m-%d %H:%M
+        "datetime_start": "2020-01-01 10:00", #IMPORTANT: IN UTC!! start responding at date."%Y-%m-%d %H:%M
+        "datetime_end": "2022-01-01 10:00", ##IMPORTANT: IN UTC!! end responding at date. "%Y-%m-%d %H:%M
     
         "body": 'Hi, User XYZ is out of office von user@example.com.', #plain text email content
         "body_html": '<h3>Out of office</h3><p>Hi, User XYZ is out of office</p>' #html email content
