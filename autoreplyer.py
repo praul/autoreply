@@ -241,9 +241,10 @@ class AutoReplyer:
         return   
     
     def create_reply(self, message):  
+        subject = message.msg['Subject'].replace('\r').replace('\n')
         reply = emails.html(  html= self.v["body_html"],
                               text= self.v["body"],
-                              subject= 'Re: ' + message.msg['Subject'],
+                              subject= 'Re: ' + subject,
                               mail_from= self.v["from_address"],                             
                              )
         return reply
@@ -269,7 +270,8 @@ class AutoReplyer:
                     assert r.status_code == 250
                     success = True
                 except:
-                    self.out('Error on send: ' + str(r))
+                    self.out('Error on sending mail')
+                    print(r)
                     try:
                         if (r.status_code == 550):
                             self.out('Mailbox unavailable')
