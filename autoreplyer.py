@@ -4,6 +4,7 @@ import sqlite3
 from datetime import date, datetime, timedelta
 import time
 import sys
+import re
 import emails
 
 __author__ = 'praul'
@@ -23,7 +24,7 @@ class AutoReplyer:
     
     v = None
     debug = False
-    version = '0.5'
+    version = '0.51'
 
     class Mailmessage:
         msg = None
@@ -240,8 +241,10 @@ class AutoReplyer:
         self.db_con.commit(); self.db_con.close() 
         return   
     
-    def create_reply(self, message):  
-        subject = message.msg['Subject'].replace('\r').replace('\n')
+    def create_reply(self, message, debug = False):  
+        if (debug == False): subject = message.msg['Subject'].replace('\r').replace('\n')
+        else: subject = re.sub(r"[^a-zA-Z0-9]+", ' ', message.msg['Subject'])
+
         reply = emails.html(  html= self.v["body_html"],
                               text= self.v["body"],
                               subject= 'Re: ' + subject,
@@ -277,7 +280,9 @@ class AutoReplyer:
                             self.out('Mailbox unavailable')
                             return
                     except:
-                        pass
+                        self.out ('Trying different subject')
+                        reply = self.create_reply(message, True)
+
                     self.out('  Wait 10s and retry...')
                     time.sleep(10) 
         
