@@ -242,7 +242,7 @@ class AutoReplyer:
         return   
     
     def create_reply(self, message, debug = False):  
-        if (debug == False): subject = message.msg['Subject'].replace('\r').replace('\n')
+        if (debug == False): subject = message.msg['Subject'].replace('\r', '').replace('\n', '')
         else: subject = re.sub(r"[^a-zA-Z0-9]+", ' ', message.msg['Subject'])
 
         reply = emails.html(  html= self.v["body_html"],
@@ -291,6 +291,7 @@ class AutoReplyer:
             self.out('Successfully replied')   
             message.sent = True 
         else: self.out('Could not respond')   
+        
         return success  
 
     def handle_reply(self, mail_number):
@@ -354,6 +355,7 @@ class AutoReplyer:
         except: self.out('No date range found. Autreply is active')
         time.sleep(5)
        
+    
         if (self.debug == True):
             while True:
                 if (self.check_program_datetime() == True): self.check_mails()
