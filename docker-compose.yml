@@ -9,6 +9,7 @@ services:
       - PGID=100
     volumes:
       - ./repliers.py:/app/repliers.py
+      - ./script.py/:/app/script.py
       - ./db:/app/db
       - /etc/localtime:/etc/localtime:ro
 

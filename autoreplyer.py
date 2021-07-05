@@ -4,6 +4,7 @@ import sqlite3
 from datetime import date, datetime, timedelta
 import time
 import sys
+import re
 import emails
 
 __author__ = 'praul'
@@ -23,7 +24,7 @@ class AutoReplyer:
     
     v = None
     debug = False
-    version = '0.5'
+    version = '0.51'
 
     class Mailmessage:
         msg = None
@@ -240,10 +241,13 @@ class AutoReplyer:
         self.db_con.commit(); self.db_con.close() 
         return   
     
-    def create_reply(self, message):  
+    def create_reply(self, message, debug = False):  
+        if (debug == False): subject = message.msg['Subject'].replace('\r', '').replace('\n', '')
+        else: subject = re.sub(r"[^a-zA-Z0-9]+", ' ', message.msg['Subject'])
+
         reply = emails.html(  html= self.v["body_html"],
                               text= self.v["body"],
-                              subject= 'Re: ' + message.msg['Subject'],
+                              subject= 'Re: ' + subject,
                               mail_from= self.v["from_address"],                             
                              )
         return reply
@@ -269,13 +273,16 @@ class AutoReplyer:
                     assert r.status_code == 250
                     success = True
                 except:
-                    self.out('Error on send: ' + str(r))
+                    self.out('Error on sending mail')
+                    print(r)
                     try:
                         if (r.status_code == 550):
                             self.out('Mailbox unavailable')
                             return
                     except:
-                        pass
+                        self.out ('Trying different subject')
+                        reply = self.create_reply(message, True)
+
                     self.out('  Wait 10s and retry...')
                     time.sleep(10) 
         
@@ -284,6 +291,7 @@ class AutoReplyer:
             self.out('Successfully replied')   
             message.sent = True 
         else: self.out('Could not respond')   
+        
         return success  
 
     def handle_reply(self, mail_number):
@@ -347,6 +355,7 @@ class AutoReplyer:
         except: self.out('No date range found. Autreply is active')
         time.sleep(5)
        
+    
         if (self.debug == True):
             while True:
                 if (self.check_program_datetime() == True): self.check_mails()
