@@ -24,7 +24,7 @@ class AutoReplyer:
     
     v = None
     debug = False
-    version = '0.51'
+    version = '0.52'
 
     class Mailmessage:
         msg = None
@@ -113,7 +113,7 @@ class AutoReplyer:
         sender = message.sender
         self.out('Mail from ' + sender + '. Checking...')   
         
-        if (sender in self.v["mymail"] or 'noreply' in sender or 'mailer-daemon' in sender):
+        if (sender in self.v["mymail"] or 'noreply' in sender or 'mailer-daemon' in sender or 'no-reply' in sender or 'No-Reply' in sender):
             self.out('Mail from self or noreply. Not sending any mail')
             return False
     

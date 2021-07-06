@@ -5,8 +5,7 @@ sys.path.append('/app')
 
 from autoreplyer import AutoReplyer
 import threading
-from repliers import *
-import time
+from repliers import v
 
 def start_autoreplier(v):
     autoreplier= AutoReplyer(v)
