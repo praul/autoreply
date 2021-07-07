@@ -24,7 +24,7 @@ class AutoReplyer:
     
     v = None
     debug = False
-    version = '0.53'
+    version = '0.53-testing-2'
 
     class Mailmessage:
         msg = None
@@ -262,38 +262,25 @@ class AutoReplyer:
 
     def send_reply(self, message):      
         self.out('Sending a response...')
-
-        success = False; r = None  
+        success = False; r = None; debug_subject = False  
         for i in range(3):
-            if (success != True):
-                
+            if (success != True):  
                 try:
-                    reply = self.create_reply(message)
-                    r = reply.send(   to= (message.sender),
-                                        smtp= {
-                                            'host': self.v["smtp_server"], 
-                                            'port': self.v["smtp_port"], 
-                                            'ssl': self.v["smtp_use_ssl"], 
-                                            'user': self.v["smtp_user"], 
-                                            'password': self.v["smtp_password"]
-                                            }
-                                     )
+                    reply = self.create_reply(message, debug_subject)
+                    r = reply.send( to= (message.sender), smtp= { 'host': self.v["smtp_server"], 'port': self.v["smtp_port"], 'ssl': self.v["smtp_use_ssl"], 'user': self.v["smtp_user"], 'password': self.v["smtp_password"] } )
                     assert r.status_code == 250
                     success = True
                 except:
                     self.out('Error on sending mail')
-                    print(r)
                     try:
                         if (r.status_code == 550):
                             self.out('Mailbox unavailable')
                             return
-                    except:
-                        self.out ('Trying different subject')
-                        reply = self.create_reply(message, True)
-
+                    except: pass  
+                    self.out ('Trying different subject')
+                    debug_subject = True
                     self.out('  Wait 10s and retry...')
                     time.sleep(10) 
-        
         
         if (success==True): 
             self.out('Successfully replied')   
