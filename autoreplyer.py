@@ -24,7 +24,7 @@ class AutoReplyer:
     
     v = None
     debug = False
-    version = '0.52'
+    version = '0.521'
 
     class Mailmessage:
         msg = None
@@ -126,10 +126,10 @@ class AutoReplyer:
                 self.db_cur.execute("DELETE FROM senders WHERE id=?", ( str(row[0]), ))
             elif (then >= breakdate): #If Recent: Reject
                 self.out('Recent entry found. Not sending any mail' )
-                self.db_con.close()
+                self.db_close()
                 return False
         
-        self.db_con.close()
+        self.db_close()
         return True
                 
     def check_mail_datetime(self,message):
@@ -201,8 +201,7 @@ class AutoReplyer:
         self.db_connect()
         self.out('Memorizing ' + message.sender)
         self.db_cur.execute("INSERT INTO senders (mail, date) values (?, ?)", (message.sender, datetime.utcnow() ) )
-        self.db_con.commit()
-        self.db_con.close()   
+        self.db_close()  
         return 
     
     def save_email(self, message):
@@ -219,8 +218,7 @@ class AutoReplyer:
             self.db_cur.execute("INSERT INTO messages (messageid, date) values (?, ?)", (message.msg_id, datetime.utcnow(),) )
             self.mail_ignorelist.append(message.msg_id)
             self.out('Current size of ram-ignorelist: ' + str(len(self.mail_ignorelist)))
-            self.db_con.commit()
-            self.db_con.close()
+            self.db_close()
         return    
            
     def db_connect(self):
@@ -238,8 +236,13 @@ class AutoReplyer:
         try: self.db_cur.execute( "ALTER TABLE messages ADD COLUMN date datetime")
         except: pass
         
-        self.db_con.commit(); self.db_con.close() 
-        return   
+        self.db_close()
+        return 
+
+    def db_close(self):
+        self.db_con.commit()
+        self.db_con.close()
+        return  
     
     def create_reply(self, message, debug = False):  
         if (debug == False): subject = message.msg['Subject'].replace('\r', '').replace('\n', '')
@@ -301,10 +304,11 @@ class AutoReplyer:
 
         if (self.check_mail_datetime(message) == True):
             if (self.check_mail_messageid(message) == True): #Shall autoreply respond? Email new, unknown and sender not blocked
+                self.save_email(message) 
                 if (self.check_sender(message) == True):
-                    self.send_reply(message)
                     self.save_sender(message)
-                self.save_email(message)  
+                    self.send_reply(message)
+                    
                 if (message.sent == True): time.sleep(2)   
         
         self.mail_ignorelist = self.mail_ignorelist[-500:] #Limit size of ignorelist
