@@ -24,7 +24,7 @@ class AutoReplyer:
     
     v = None
     debug = False
-    version = '0.521'
+    version = '0.53'
 
     class Mailmessage:
         msg = None
@@ -44,7 +44,12 @@ class AutoReplyer:
             self.sender = self.get_sender(self.msg)
 
         def get_message(self, data):
-            msg = email.message_from_bytes(data[0][1])
+            #Testing - seems to work. More failproof
+            for response_part in data:
+                if isinstance(response_part, tuple):
+                    msg = email.message_from_bytes(response_part[1])
+            
+            #msg = email.message_from_bytes(data[0][1])
             return msg
 
         def get_messageid(self, msg):
@@ -317,7 +322,8 @@ class AutoReplyer:
     def fetch_mails(self, mail_number):
         try:
             self.imap.select(readonly=True)
-            _, data = self.imap.fetch(mail_number, '(RFC822)')
+            #_, data = self.imap.fetch(mail_number, '(RFC822)')
+            _, data = self.imap.fetch(mail_number, '(BODY.PEEK[HEADER])')
             self.imap.close()
         except:   
             self.out ('Error on Imap Fetch') 
