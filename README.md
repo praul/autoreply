@@ -22,7 +22,7 @@ This is a early version of this script. If you run into issues, please let me kn
 - docker image for amd64 platforms. build yourself for arm and others.
 
 ## Usage
-- **you need to customize the repliers.py file** It needs to stay a valid python dictionary. All the keys have to remain! If you have errors at startup, this could be a place to look for missing commata or quotes. You can add as many mail accounts as you like. 
+- **you need to create a repliers.py file from repliers.py.example and customize it.** It needs to stay a valid python dictionary. All the keys have to remain! If you have errors at startup, this could be a place to look for missing commata or quotes. You can add as many mail accounts as you like. 
 - **USE UTC DATETIMES as of 0.5** for your autoreply begin and end datetimes.
 
 ## Usage: Docker Container
