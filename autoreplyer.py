@@ -25,7 +25,7 @@ class AutoReplyer:
     
     v = None
     debug = False
-    version = '0.53-testing-3'
+    version = '0.53-testing-4'
 
     class Mailmessage:
         msg = None
@@ -73,15 +73,17 @@ class AutoReplyer:
         except: self.v["mode"] = 'reply'
         
         try: 
+            self.program_loglevel = self.v['loglevel'] 
+        except: 
+            pass
+        
+        try: 
             if (self.v['debug'] == True): 
                 self.program_loglevel = 'DEBUG'
                 self.debug = True
         except: 
             pass 
-        try: 
-            self.program_loglevel = self.v['loglevel'] 
-        except: 
-            pass
+        
  
         FORMAT='%(levelname)-8s %(message)s'
         logging.basicConfig(level=logging.getLevelName(self.program_loglevel), format=FORMAT)
@@ -165,14 +167,14 @@ class AutoReplyer:
                 start = self.mail_lastcheck
                 end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")
             except:
-                self.out_warning('New mail but could not determine date. Assuming as new...')
+                self.out_warning('Could not determine date of mail. Assuming as new...')
                 return True
 
             if (dateobj >= start and dateobj <= end): 
-                self.out_debug('New mail within date range.' + str(dateobj) + ' UTC')
+                self.out_debug('Mail within date range.' + str(dateobj) + ' UTC')
                 return True
             else: 
-                self.out_debug('Message not within date range. Message Date ' + str(dateobj) + ' UTC')
+                self.out('Mail not within date range. Message Date ' + str(dateobj) + ' UTC')
                 return False
  
     def check_program_datetime(self):
@@ -180,6 +182,7 @@ class AutoReplyer:
             start = datetime.strptime(self.v["datetime_start"], "%Y-%m-%d %H:%M")  
             end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")
         except:
+            self.connect_imap_login()
             return True
         
         if (datetime.utcnow() >= start and datetime.utcnow() <= end):
@@ -216,8 +219,8 @@ class AutoReplyer:
             self.db_con.close()
             return False
     
-        self.out('New Message: ' + message.msg_id)
         self.db_con.close()
+        self.out('New Message: ' + message.msg_id + ' from ' + message.sender)
         return True
 
     def save_sender(self,message):
@@ -237,7 +240,7 @@ class AutoReplyer:
         
         if (message.has_msg_id == True):        
             self.db_connect()
-            self.out('Memorizing Message ' + message.msg_id + ' ' + datetime.utcnow().strftime("%Y-%m-%d %H:%M") )
+            self.out('Memorizing Message ' + message.msg_id + ' || ' + datetime.utcnow().strftime("%Y-%m-%d %H:%M") )
             self.db_cur.execute("INSERT INTO messages (messageid, date) values (?, ?)", (message.msg_id, datetime.utcnow(),) )
             self.mail_ignorelist.append(message.msg_id)
             self.out('Current size of ram-ignorelist: ' + str(len(self.mail_ignorelist)))
@@ -312,9 +315,9 @@ class AutoReplyer:
         if (data == False): return
         message = self.Mailmessage(data, mail_number, self.debug)
 
-        if (self.check_mail_datetime(message) == True):
-            if (self.check_mail_messageid(message) == True): #Shall autoreply respond? Email new, unknown and sender not blocked
-                self.save_email(message) 
+        if (self.check_mail_messageid(message) == True):
+            self.save_email(message) 
+            if (self.check_mail_datetime(message) == True):        #Shall autoreply respond? Email new, unknown and sender not blocked
                 if (self.check_sender(message) == True):
                     self.save_sender(message)
                     self.send_reply(message)
@@ -365,7 +368,8 @@ class AutoReplyer:
     def run(self):
         self.db_create_table()
         self.out('Autoreply ' + self.version + ' started in ' + self.v["mode"] + '-mode ... Blocking re-replies for ' + str(self.v["blockhours"]) + ' hours')        
-        self.out('Autoreply works in UTC timezone. Message dates will be converted. Please check, if you set your start- and enddates in UTC. It is now ' + str(datetime.utcnow()) + ' UTC')
+        self.out('Autoreply works in UTC timezone. Message dates will be converted. Please check, if you set your start- and enddates in UTC.')
+        self.out('It is now ' + str(datetime.utcnow()) + ' UTC')
         try: self.out('Response active from ' + str(self.v["datetime_start"]) + ' UTC until ' + str(self.v["datetime_end"]) + ' UTC' )
         except: self.out('No date range found. Autreply is active')
         time.sleep(5)
