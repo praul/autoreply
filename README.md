@@ -1,4 +1,3 @@
-# praul/autoreply
 ![image](https://user-images.githubusercontent.com/38807639/124926963-64289300-dffe-11eb-9ed0-510aa44ddcf9.png)
 
 This is a python based, mail server independent out-of-office notice for multiple mail accounts.  
