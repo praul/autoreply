@@ -14,7 +14,7 @@ This is a early version of this script. If you run into issues, please let me kn
 
 ## Features 
 - Checks multiple imap accounts for mails that are both unread and unanswered
-- Sends custom plaintext and html replies to the senders.
+- Sends custom plaintext and html replies to the senders (over smtp).
 - Remembers the incoming mail as processed (remember-mode, see below) or marks the corresponding incoming email as "replied" (reply-mode).
 - Remembers the senders for a customizable time range, and does not send another reply during this time range - no autoreply pingpong
 - Replies only within a customizable date range - you will never forget to disable your out-of-office notice
