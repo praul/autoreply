@@ -71,6 +71,9 @@ class AutoReplyer:
         #Test and set new variables for repliers.py backwards compability
         try: self.v["mode"]
         except: self.v["mode"] = 'reply'
+
+        try: self.debug = self.v['debug']
+        except: self.debug = False       
         
         try: 
             self.program_loglevel = self.v['loglevel'] 
@@ -84,11 +87,10 @@ class AutoReplyer:
         except: 
             pass 
         
- 
         FORMAT='%(levelname)-8s %(message)s'
         logging.basicConfig(level=logging.getLevelName(self.program_loglevel), format=FORMAT)
 
-        self.mail_lastcheck = datetime.utcnow() - timedelta(hours=24) 
+        self.mail_lastcheck = datetime.utcnow() - timedelta(minutes=20)
         self.run()
 
     def out_debug(self, text):
@@ -362,7 +364,7 @@ class AutoReplyer:
         for mail_number in data[0].split():            
             self.handle_reply(mail_number)
         
-        self.mail_lastcheck = datetime.utcnow() - timedelta(hours=24)
+        self.mail_lastcheck = datetime.utcnow() - timedelta(minutes=20)
         return
 
 
