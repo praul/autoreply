@@ -1,4 +1,5 @@
-![image](https://user-images.githubusercontent.com/38807639/124926963-64289300-dffe-11eb-9ed0-510aa44ddcf9.png)
+![image](https://user-images.githubusercontent.com/38807639/124927237-b36ec380-dffe-11eb-8362-016549534195.png)
+
 
 This is a python based, mail server independent out-of-office notice for multiple mail accounts.  
 **Do you have multiple mail accounts on hosts, that don't support proper out-of-office notices?**  
