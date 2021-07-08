@@ -1,5 +1,5 @@
-# autoreply
-![image](https://user-images.githubusercontent.com/38807639/123649002-bc56dc80-d829-11eb-8995-5086fba163ca.png)
+# praul/autoreply
+![image](https://user-images.githubusercontent.com/38807639/124926963-64289300-dffe-11eb-9ed0-510aa44ddcf9.png)
 
 This is a python based, mail server independent out-of-office notice for multiple mail accounts.  
 **Do you have multiple mail accounts on hosts, that don't support proper out-of-office notices?**  
