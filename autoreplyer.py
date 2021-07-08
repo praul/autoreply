@@ -70,7 +70,7 @@ class AutoReplyer:
         
         #Test and set new variables for repliers.py backwards compability
         try: self.v["mode"]
-        except: self.v["mode"] = 'remember'
+        except: self.v["mode"] = 'reply'
         
         try: 
             self.program_loglevel = self.v['loglevel'] 
@@ -136,7 +136,7 @@ class AutoReplyer:
     
     def check_sender(self, message):
         sender = message.sender
-        self.out('Mail from ' + sender + '. Checking...')   
+        self.out('Checking sender ' + sender + ' ...')   
         
         if (sender in self.v["mymail"] or 'noreply' in sender or 'mailer-daemon' in sender or 'no-reply' in sender or 'No-Reply' in sender):
             self.out('Mail from self or noreply. Not sending any mail')
@@ -243,7 +243,7 @@ class AutoReplyer:
             self.out('Memorizing Message ' + message.msg_id + ' || ' + datetime.utcnow().strftime("%Y-%m-%d %H:%M") )
             self.db_cur.execute("INSERT INTO messages (messageid, date) values (?, ?)", (message.msg_id, datetime.utcnow(),) )
             self.mail_ignorelist.append(message.msg_id)
-            self.out('Current size of ram-ignorelist: ' + str(len(self.mail_ignorelist)))
+            self.out_debug('Current size of ram-ignorelist: ' + str(len(self.mail_ignorelist)))
             self.db_close()
         return    
            
@@ -320,9 +320,10 @@ class AutoReplyer:
             if (self.check_mail_datetime(message) == True):        #Shall autoreply respond? Email new, unknown and sender not blocked
                 if (self.check_sender(message) == True):
                     self.save_sender(message)
-                    self.send_reply(message)
-                    
-                if (message.sent == True): time.sleep(2)   
+                    self.send_reply(message)   
+                self.out("---------------------") 
+                if (message.sent == True): time.sleep(1)  
+                
         
         self.mail_ignorelist = self.mail_ignorelist[-500:] #Limit size of ignorelist
         return
@@ -368,7 +369,7 @@ class AutoReplyer:
     def run(self):
         self.db_create_table()
         self.out('Autoreply ' + self.version + ' started in ' + self.v["mode"] + '-mode ... Blocking re-replies for ' + str(self.v["blockhours"]) + ' hours')        
-        self.out('Autoreply works in UTC timezone. Message dates will be converted. Please check, if you set your start- and enddates in UTC.')
+        self.out('Autoreply works in UTC timezone. Message dates will be converted. Please check that you set your start- and enddates in UTC.')
         self.out('It is now ' + str(datetime.utcnow()) + ' UTC')
         try: self.out('Response active from ' + str(self.v["datetime_start"]) + ' UTC until ' + str(self.v["datetime_end"]) + ' UTC' )
         except: self.out('No date range found. Autreply is active')
