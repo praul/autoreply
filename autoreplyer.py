@@ -1,14 +1,14 @@
 import email
 from imaplib import IMAP4, IMAP4_SSL, IMAP4_PORT, IMAP4_SSL_PORT
 import sqlite3
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 import time
 import sys
 import re
+import logging
 import emails
 
 __author__ = 'praul'
-
 
 class AutoReplyer:
     db_con = None
@@ -17,6 +17,7 @@ class AutoReplyer:
     program_timeout = None
     program_date_active = None
     program_timezone = None
+    program_loglevel = 'INFO'
    
     mail_ignorelist = []
     mail_isloggedin = False
@@ -24,7 +25,7 @@ class AutoReplyer:
     
     v = None
     debug = False
-    version = '0.521'
+    version = '0.53'
 
     class Mailmessage:
         msg = None
@@ -44,7 +45,9 @@ class AutoReplyer:
             self.sender = self.get_sender(self.msg)
 
         def get_message(self, data):
-            msg = email.message_from_bytes(data[0][1])
+            for response_part in data:
+                if isinstance(response_part, tuple):
+                    msg = email.message_from_bytes(response_part[1])
             return msg
 
         def get_messageid(self, msg):
@@ -64,24 +67,46 @@ class AutoReplyer:
     def __init__(self, v):               
         self.v = v
         self.program_timeout = self.v["refresh_delay"]
-        try: self.v["mode"] = self.v["mode"]
-        except: self.v["mode"] = 'reply'
-        try: self.debug = self.v['debug']
-        except: self.debug = False       
-
-        self.mail_lastcheck = datetime.utcnow() - timedelta(minutes=20)
         
+        #Test and set new variables for repliers.py backwards compability
+        try: self.v["mode"]
+        except: self.v["mode"] = 'reply'
+        
+        try: 
+            self.program_loglevel = self.v['loglevel'] 
+        except: 
+            pass
+        
+        try: 
+            if (self.v['debug'] == True): 
+                self.program_loglevel = 'DEBUG'
+                self.debug = True
+        except: 
+            pass 
+        
+ 
+        FORMAT='%(levelname)-8s %(message)s'
+        logging.basicConfig(level=logging.getLevelName(self.program_loglevel), format=FORMAT)
+
+        self.mail_lastcheck = datetime.utcnow() - timedelta(minutes=20) 
         self.run()
 
-    def debug_print(self, text):
-        if self.debug: self.out(str(text))
-        return
-    
-    def out(self, text):
-        print(self.color() + self.v["mymail"] + self.color(True) +  ": " + str(text) )
+    def out_debug(self, text):
+        self.out(str(text), 1)
         return
 
-    def color(self, end = False):
+    def out_warning(self, text):
+        self.out(str(text), 3)
+        return
+    
+    def out(self, text, level=2):
+        out = self.out_color() + self.v["mymail"] + self.out_color(True) +  ": " + str(text) 
+        if level == 1: logging.debug(out)
+        elif level == 2: logging.info(out)
+        elif level == 3: logging.warning(out)
+        return
+
+    def out_color(self, end = False):
         colors = { 'HEADER': '\033[95m', 'OKBLUE': '\033[94m', 'OKCYAN': '\033[96m', 'OKGREEN': '\033[92m', 'WARNING': '\033[93m', 'FAIL': '\033[91m', 'ENDC': '\033[0m', 'BOLD': '\033[1m', 'UNDERLINE': '\033[4m',        }
         if (end == True): return colors['ENDC']
         return colors[self.v["color"]]  
@@ -111,7 +136,7 @@ class AutoReplyer:
     
     def check_sender(self, message):
         sender = message.sender
-        self.out('Mail from ' + sender + '. Checking...')   
+        self.out('Checking sender ' + sender + ' ...')   
         
         if (sender in self.v["mymail"] or 'noreply' in sender or 'mailer-daemon' in sender or 'no-reply' in sender or 'No-Reply' in sender):
             self.out('Mail from self or noreply. Not sending any mail')
@@ -142,14 +167,14 @@ class AutoReplyer:
                 start = self.mail_lastcheck
                 end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")
             except:
-                self.debug_print('New mail but could not determine date. Assuming as new...')
+                self.out_warning('Could not determine date of mail. Assuming as new...')
                 return True
 
             if (dateobj >= start and dateobj <= end): 
-                self.debug_print('New mail within date range.' + str(dateobj) + ' UTC')
+                self.out_debug('Mail within date range.' + str(dateobj) + ' UTC')
                 return True
             else: 
-                self.debug_print ('Message not within date range. Message Date ' + str(dateobj) + ' UTC')
+                self.out('Mail not within date range. Message Date ' + str(dateobj) + ' UTC')
                 return False
  
     def check_program_datetime(self):
@@ -157,6 +182,7 @@ class AutoReplyer:
             start = datetime.strptime(self.v["datetime_start"], "%Y-%m-%d %H:%M")  
             end = datetime.strptime(self.v["datetime_end"], "%Y-%m-%d %H:%M")
         except:
+            self.connect_imap_login()
             return True
         
         if (datetime.utcnow() >= start and datetime.utcnow() <= end):
@@ -175,26 +201,26 @@ class AutoReplyer:
             return False
     
     def check_mail_messageid(self, message):
-        self.debug_print('Checking Message ID: ' + message.msg_id )
+        self.out_debug('Checking Message ID: ' + message.msg_id )
     
         if (message.msg_id in self.mail_ignorelist):
-           self.debug_print('Found in memory:' + message.msg_id )
+           self.out_debug('Found in memory:' + message.msg_id )
            return False
  
         self.db_connect()
         for row in self.db_cur.execute("SELECT id, date FROM messages WHERE messageid=?", (message.msg_id,)):       
-            self.debug_print('Found :' +message.msg_id + ' at ID ' + str(row[0]))
+            self.out_debug('Found :' +message.msg_id + ' at ID ' + str(row[0]))
             try: 
                 if ((datetime.utcnow() - timedelta(hours=24)) < datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S.%f")):
                     self.mail_ignorelist.append(message.msg_id)
-                    self.debug_print('Entry is recent. Adding to ignorelist')
-                    self.debug_print(str(self.mail_ignorelist))
+                    self.out_debug('Entry is recent. Adding to ignorelist')
+                    self.out_debug(str(self.mail_ignorelist))
             except: pass
             self.db_con.close()
             return False
     
-        self.out('New Message: ' + message.msg_id)
         self.db_con.close()
+        self.out('New Message: ' + message.msg_id + ' from ' + message.sender)
         return True
 
     def save_sender(self,message):
@@ -206,18 +232,18 @@ class AutoReplyer:
     
     def save_email(self, message):
         if (self.v['mode'] != 'remember' or message.has_msg_id == False):
-            if (self.v['mode'] != 'remember'): self.debug_print ('Autoreply in reply-mode. Marking mail as "answered"')
-            if (message.has_msg_id == False): self.debug_print ('No MessageID. Marking mail as "answered"')
+            if (self.v['mode'] != 'remember'): self.out_debug('Autoreply in reply-mode. Marking mail as "answered"')
+            if (message.has_msg_id == False): self.out_debug('No MessageID. Marking mail as "answered"')
             self.imap.select(readonly=False)
             self.imap.store(message.msg_number, '+FLAGS', '\\Answered')
             self.imap.close()
         
         if (message.has_msg_id == True):        
             self.db_connect()
-            self.out('Memorizing Message ' + message.msg_id + ' ' + datetime.utcnow().strftime("%Y-%m-%d %H:%M") )
+            self.out('Memorizing Message ' + message.msg_id + ' || ' + datetime.utcnow().strftime("%Y-%m-%d %H:%M") )
             self.db_cur.execute("INSERT INTO messages (messageid, date) values (?, ?)", (message.msg_id, datetime.utcnow(),) )
             self.mail_ignorelist.append(message.msg_id)
-            self.out('Current size of ram-ignorelist: ' + str(len(self.mail_ignorelist)))
+            self.out_debug('Current size of ram-ignorelist: ' + str(len(self.mail_ignorelist)))
             self.db_close()
         return    
            
@@ -257,43 +283,30 @@ class AutoReplyer:
 
     def send_reply(self, message):      
         self.out('Sending a response...')
-
-        success = False; r = None  
+        success = False; r = None; debug_subject = False  
         for i in range(3):
-            if (success != True):
-                
+            if (success != True):  
                 try:
-                    reply = self.create_reply(message)
-                    r = reply.send(   to= (message.sender),
-                                        smtp= {
-                                            'host': self.v["smtp_server"], 
-                                            'port': self.v["smtp_port"], 
-                                            'ssl': self.v["smtp_use_ssl"], 
-                                            'user': self.v["smtp_user"], 
-                                            'password': self.v["smtp_password"]
-                                            }
-                                     )
+                    reply = self.create_reply(message, debug_subject)
+                    r = reply.send( to= (message.sender), smtp= { 'host': self.v["smtp_server"], 'port': self.v["smtp_port"], 'ssl': self.v["smtp_use_ssl"], 'user': self.v["smtp_user"], 'password': self.v["smtp_password"] } )
                     assert r.status_code == 250
                     success = True
                 except:
-                    self.out('Error on sending mail')
-                    print(r)
+                    self.out_warning('Error on sending mail')
                     try:
                         if (r.status_code == 550):
-                            self.out('Mailbox unavailable')
+                            self.out_warning('Mailbox unavailable')
                             return
-                    except:
-                        self.out ('Trying different subject')
-                        reply = self.create_reply(message, True)
-
-                    self.out('  Wait 10s and retry...')
+                    except: pass  
+                    self.out_warning ('Trying different subject')
+                    debug_subject = True
+                    self.out_warning('Wait 10s and retry...')
                     time.sleep(10) 
-        
         
         if (success==True): 
             self.out('Successfully replied')   
             message.sent = True 
-        else: self.out('Could not respond')   
+        else: self.out_warning('Could not respond')   
         
         return success  
 
@@ -302,14 +315,15 @@ class AutoReplyer:
         if (data == False): return
         message = self.Mailmessage(data, mail_number, self.debug)
 
-        if (self.check_mail_datetime(message) == True):
-            if (self.check_mail_messageid(message) == True): #Shall autoreply respond? Email new, unknown and sender not blocked
-                self.save_email(message) 
+        if (self.check_mail_messageid(message) == True):
+            self.save_email(message) 
+            if (self.check_mail_datetime(message) == True):        #Shall autoreply respond? Email new, unknown and sender not blocked
                 if (self.check_sender(message) == True):
                     self.save_sender(message)
-                    self.send_reply(message)
-                    
-                if (message.sent == True): time.sleep(2)   
+                    self.send_reply(message)   
+                self.out("---------------------") 
+                if (message.sent == True): time.sleep(1)  
+                
         
         self.mail_ignorelist = self.mail_ignorelist[-500:] #Limit size of ignorelist
         return
@@ -317,7 +331,8 @@ class AutoReplyer:
     def fetch_mails(self, mail_number):
         try:
             self.imap.select(readonly=True)
-            _, data = self.imap.fetch(mail_number, '(RFC822)')
+            #_, data = self.imap.fetch(mail_number, '(RFC822)')
+            _, data = self.imap.fetch(mail_number, '(BODY.PEEK[HEADER])')
             self.imap.close()
         except:   
             self.out ('Error on Imap Fetch') 
@@ -330,7 +345,7 @@ class AutoReplyer:
         default = 'UNSEEN UNANSWERED'
         yesterday = (datetime.utcnow() - timedelta(hours=24)).strftime("%d-%b-%Y")
         search = '('+ default + ' SINCE ' + yesterday + ')'
-        self.debug_print('IMAP SEARCH COMMAND: ' + search)
+        self.out_debug('IMAP SEARCH COMMAND: ' + search)
         return search
   
     def check_mails(self):
@@ -347,14 +362,15 @@ class AutoReplyer:
         for mail_number in data[0].split():            
             self.handle_reply(mail_number)
         
-        self.mail_lastcheck = datetime.utcnow() - timedelta(minutes=20)
+        self.mail_lastcheck = datetime.utcnow() - timedelta(hours=24)
         return
 
 
     def run(self):
         self.db_create_table()
         self.out('Autoreply ' + self.version + ' started in ' + self.v["mode"] + '-mode ... Blocking re-replies for ' + str(self.v["blockhours"]) + ' hours')        
-        self.out('Autoreply works in UTC timezone. Message dates will be converted. Please check, if you set your start- and enddates in UTC. It is now ' + str(datetime.utcnow()) + ' UTC')
+        self.out('Autoreply works in UTC timezone. Message dates will be converted. Please check that you set your start- and enddates in UTC.')
+        self.out('It is now ' + str(datetime.utcnow()) + ' UTC')
         try: self.out('Response active from ' + str(self.v["datetime_start"]) + ' UTC until ' + str(self.v["datetime_end"]) + ' UTC' )
         except: self.out('No date range found. Autreply is active')
         time.sleep(5)
@@ -365,6 +381,7 @@ class AutoReplyer:
                 if (self.check_program_datetime() == True): self.check_mails()
                 if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
                 time.sleep(self.v["refresh_delay"])
+               
         else:        
             while True:
                 try:
@@ -372,7 +389,7 @@ class AutoReplyer:
                     if (int(self.v["refresh_delay"]) < 30 and self.v["mode"] == 'remember'): self.v["refresh_delay"] = 30 #take some load of server on remember mode
                     time.sleep(self.v["refresh_delay"])
                 except: 
-                    self.out(sys.exc_info()[0])
+                    self.out_warning(sys.exc_info()[0])
                     self.program_date_active = None
                     time.sleep(10)
         
