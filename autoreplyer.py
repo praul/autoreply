@@ -70,7 +70,7 @@ class AutoReplyer:
         
         #Test and set new variables for repliers.py backwards compability
         try: self.v["mode"]
-        except: self.v["mode"] = 'reply'
+        except: self.v["mode"] = 'remember'
         
         try: 
             self.program_loglevel = self.v['loglevel'] 
