@@ -3,7 +3,7 @@
 
 This is a python based, mail server independent out-of-office notice for multiple mail accounts.  
 **Do you have multiple mail accounts on hosts, that don't support proper out-of-office notices?**  
-This could be for you. Run this on server, nas, homelab or raspberry. Run this on any device that is on 24/7 and supports python.
+This could be for you. Run this on server, nas, homelab or raspberry. Run this on any device that is powered on 24/7 and supports python.
 
 See Changelog here: https://github.com/praul/autoreply/wiki/Changelog
              
