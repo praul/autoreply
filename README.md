@@ -15,33 +15,34 @@ This is a early version of this script. If you run into issues, please let me kn
 ## Features 
 - Checks multiple imap accounts for mails that are both unread and unanswered
 - Sends custom plaintext and html replies to the senders.
-- Marks the corresponding incoming email as "replied"
+- Remembers the incoming mail as processed (remember-mode, see below) or marks the corresponding incoming email as "replied" (reply-mode).
 - Remembers the senders for a customizable time range, and does not send another reply during this time range - no autoreply pingpong
 - Replies only within a customizable date range - you will never forget to disable your out-of-office notice
 - python based, should run on any platform
 - docker image for amd64 platforms. build yourself for arm and others.
 
 ## Usage
-- **you need to customize the repliers.py file** It needs to stay a valid python dictionary. All the keys have to remain! If you have errors at startup, this could be a place to look for missing commata or quotes. You can add as many mail accounts as you like. **USE UTC DATETIMES as of 0.5**
+- **you need to customize the repliers.py file** It needs to stay a valid python dictionary. All the keys have to remain! If you have errors at startup, this could be a place to look for missing commata or quotes. You can add as many mail accounts as you like. 
+- **USE UTC DATETIMES as of 0.5** for your autoreply begin and end datetimes.
 
 ## Usage: Docker Container
 - **Image**: Clone this repo and build from dockerfile. Or use praul1/autoreply:latest from docker hub  
-  
+- **Docker-Compose** (recommended): You can use the supplied docker-compose.yml. Customize path to point to your repliers.py and db folder. 
+- The docker-compose file also includes the docker-log viewer "Dozzle" (https://github.com/amir20/dozzle). When launched, you can visit: http://HOST:10101/show?name=autoreply_autoreply to view the log of autoreply. 
+- 
 - **Run**: You need to mount your repliers.py file to /app/repliers.py inside the container. Also, mount a writable db folder to /app/db 
 - **Run command**: ```docker run -v /etc/localtime:/etc/localtime:ro -v /PATH/TO/repliers.py:/app/repliers.py -v /PATH/TO/db:/app/db praul1/autoreply:latest```
   
-- **Docker-Compose**: You can use the supplied docker-compose.yml. Customize path to point to your repliers.py and db folder. 
-- The docker-compose file also includes the docker-log viewer "Dozzle" (https://github.com/amir20/dozzle). When launched, you can visit: http://HOST:10101 to view the log of autoreply  
-
 ## Usage: Python
 - You will need python3 and python-emails (https://python-emails.readthedocs.io/en/latest/)
 - ```pip3 install emails```
 - All files should be in the same folder. You can then launch the autoresponder with
 - ```python3 script.py```
-- There should be a writable "db"-folder in script path
+- There has to be a writable "db"-folder in script path
+
 
 ## Settings (repliers.py)
-- **remember-mode**. Set ```"mode": "remember",``` in repliers.py. In this mode, emails will NOT be marked as "replied". Instead, autoreply remembers the corresponding messageids. This is way slower than "reply" (default setting). Use this, if you still want to keep track, to which emails **you** actually replied. Keep in mind, this could get slow, as there is no possibility to tell imap exactly which mails to fetch. As of 0.41 autoreplyer only fetches mails from the last two days (unanswered, unread) and loops through them. If you get thousands of emails everyday, this will be slow. On remember mode, minimum refresh rate is 30 seconds.
+- **remember-mode**. Set ```"mode": "remember",``` in repliers.py. In this mode, emails will NOT be marked as "replied". Instead, autoreply remembers the corresponding messageids. This is way slower than "reply" (default setting). Use this, if you still want to keep track, to which emails **you** actually replied. If you get thousands of emails everyday, this will be slow. On remember mode, minimum refresh rate is set automatically to 30 seconds. If you want faster replies, you can go for "reply" mode.
 - "debug" key. Leave it at "False", it will spam your console otherwise
 
 
