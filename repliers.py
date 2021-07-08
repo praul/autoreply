@@ -4,10 +4,10 @@ v = [
         "mymail": 'user@example.com',
         "from_address": ('Out of Office', 'user@example.com'), #Name and Email
         "color": "OKCYAN", #HEADER, OKBLUE OKCYAN OKGREEN WARNING FAIL ENDC UNDERLINE 
-        "mode": 'reply', #"reply" or "remember"   - how to remember emails, that already have been replied to. mark as replied or remember in database (slower). 
+        "mode": 'remember', #"reply" or "remember"   - how to remember emails, that already have been replied to. mark as replied or remember in database (slower). 
     
-        "debug": False, #When set to true, this will spam your console. Leave it at False :)
-
+        "debug": False, #When set to true, this will spam your console. When set to true, loglevel is also set to DEBUG. Leave it at False :)
+        "loglevel": 'INFO', #DEBUG, INFO, WARNING
 
         "refresh_delay": 5,  #delay in seconds between new email checks
 
@@ -41,7 +41,11 @@ v = [
         "mymail": 'user@example.com',
         "from_address": ('Out of Office', 'user@example.com'), #Name and Email
         "color": "OKGREEN", #Terminal Color: HEADER, OKBLUE OKCYAN OKGREEN WARNING FAIL ENDC UNDERLINE 
+        "mode": 'remember', #"reply" or "remember"   - how to remember emails, that already have been replied to. mark as replied or remember in database (slower). 
         
+        "debug": False, #When set to true, this will spam your console. When set to true, loglevel is also set to DEBUG. Leave it at False :)
+        "loglevel": 'INFO', #DEBUG, INFO, WARNING
+
         "refresh_delay": 5,  #delay in seconds between new email checks
 
         "imap_server": 'imap.example.com',
