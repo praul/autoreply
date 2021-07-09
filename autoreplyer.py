@@ -354,9 +354,9 @@ class AutoReplyer:
             _, data = self.imap.search(None, self.check_mails_search())
             self.imap.close()    
         except:
-            self.out ('Error on Imap Search. Reconnecting') 
+            self.out_warning ('Error on Imap Search. Reconnecting') 
             self.connect_imap_reconnect()
-            self.out ('Connected: ' + str(self.mail_isloggedin))
+            self.out_warning ('Connected: ' + str(self.mail_isloggedin))
             return 
 
         for mail_number in data[0].split():            
