@@ -335,9 +335,9 @@ class AutoReplyer:
             _, data = self.imap.fetch(mail_number, '(BODY.PEEK[HEADER])')
             self.imap.close()
         except:   
-            self.out ('Error on Imap Fetch') 
+            self.out_warning ('Error on Imap Fetch') 
             self.connect_imap_reconnect()
-            self.out ('Connected: ' + str(self.mail_isloggedin))
+            self.out_warning ('Connected: ' + str(self.mail_isloggedin))
             return False
         return data
 
