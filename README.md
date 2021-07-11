@@ -74,3 +74,4 @@ There are two bad scenarios when it comes to autoreplies. **Here are some infos 
 - Using pythons threading is a quick-and-dirty approach for supporting multiple accounts simultaneously without having to rewrite the base script for this
 - I made this basically for myself, so I'm probably not gonna pump this up with feature requests :) 
 - If you start this script and have both unanswered and unread mails in your inbox, autoreply will answer to those, that were received up to 20 minutes ago. It does so to prevent unanswered mails on restart or downtime.
+- On my imap accounts, connection gets dropped after 24hours. autoreply then automatically reconnects.
