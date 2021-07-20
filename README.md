@@ -9,8 +9,7 @@ See Changelog here: https://github.com/praul/autoreply/wiki/Changelog
              
 **Use at own risk. Try interactive first and cancel script if it somehow messes up.**
              
-I run this 24/7 on a vserver for multiple mail accounts without problems, but please note: 
-This is a early version of this script. If you run into issues, please let me know. 
+I run this 24/7 on a vserver for multiple mail accounts without problems, but please: if you run into issues, let me know. 
 
 ## Features 
 - Checks multiple imap accounts for mails that are both unread and unanswered
