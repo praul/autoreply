@@ -25,7 +25,7 @@ class AutoReplyer:
     
     v = None
     debug = False
-    version = '0.53'
+    version = '1.0'
 
     class Mailmessage:
         msg = None
