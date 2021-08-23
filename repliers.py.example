@@ -22,6 +22,7 @@ v = [
         "smtp_server": 'smtp.example.com',
         "smtp_port": 465, 
         "smtp_use_ssl": True,
+        "smtp_use_tls": False,
 
         "smtp_user": 'user@example.com',
         "smtp_password": 'YOURSUPERSAFEPASSWORD',
