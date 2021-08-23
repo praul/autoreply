@@ -43,6 +43,7 @@ I run this 24/7 on a vserver for multiple mail accounts without problems, but pl
 ## Settings (repliers.py)
 - **remember-mode**. Set ```"mode": "remember",``` in repliers.py. In this mode, emails will NOT be marked as "replied". Instead, autoreply remembers the corresponding messageids. This is way slower than "reply" (default setting). Use this, if you still want to keep track, to which emails **you** actually replied. If you get thousands of emails everyday, this will be slow. On remember mode, minimum refresh rate is set automatically to 30 seconds. If you want faster replies, you can go for "reply" mode.
 - "debug" key. Leave it at "False", it will spam your console otherwise
+- If your smtp server needs ssl set "smtp_use_ssl" : True and "smtp_use_tls" : False. If your smtp server needs tls, do it the other way around
 
 
 ## Backgrounds on preventing reply errors
