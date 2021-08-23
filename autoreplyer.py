@@ -71,6 +71,8 @@ class AutoReplyer:
         #Test and set new variables for repliers.py backwards compability
         try: self.v["mode"]
         except: self.v["mode"] = 'reply'
+        try: self.v["smtp_use_tls"]
+        except: self.v["smtp_use_tls"] = False
         
         try: 
             self.program_loglevel = self.v['loglevel'] 
@@ -284,11 +286,19 @@ class AutoReplyer:
     def send_reply(self, message):      
         self.out('Sending a response...')
         success = False; r = None; debug_subject = False  
+        
+        if (self.debug == True):
+            reply = self.create_reply(message, debug_subject)
+            r = reply.send( to= (message.sender), smtp= { 'host': self.v["smtp_server"], 'port': self.v["smtp_port"], 'tls': self.v["smtp_use_tls"], 'ssl': self.v["smtp_use_ssl"], 'user': self.v["smtp_user"], 'password': self.v["smtp_password"] } )
+            print(r)
+            return True
+        
+        
         for i in range(3):
             if (success != True):  
                 try:
                     reply = self.create_reply(message, debug_subject)
-                    r = reply.send( to= (message.sender), smtp= { 'host': self.v["smtp_server"], 'port': self.v["smtp_port"], 'ssl': self.v["smtp_use_ssl"], 'user': self.v["smtp_user"], 'password': self.v["smtp_password"] } )
+                    r = reply.send( to= (message.sender), smtp= { 'host': self.v["smtp_server"], 'port': self.v["smtp_port"], 'tls': self.v["smtp_use_tls"], 'ssl': self.v["smtp_use_ssl"], 'user': self.v["smtp_user"], 'password': self.v["smtp_password"] } )
                     assert r.status_code == 250
                     success = True
                 except:
